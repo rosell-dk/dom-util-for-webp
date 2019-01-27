@@ -11,10 +11,11 @@ This library can do two things:
 
 The *ImageUrlReplacer* class allows you to change all image URLs in a piece of HTML.
 
-The behaviour can be modified setting public properties such as *$urlReplacerFunction* and *$attributeFilterFunction*. This behaviour will likely change in 0.2, where we change to classic OOP (to change behaviour, you extend the class)
+The behaviour can be modified by overriding public methods such as *replaceUrl*
 
 Default behaviour:
-- The modified URL is the same as the original, with ".webp" appended                   ($urlReplacerFunction)
-- Limits to these tags: <img>, <source>, <input> and <iframe>                           ($searchInTags)
-- Limits to these attributes: "src", "src-set" and any attribute starting with "data-"  ($attributeFilterFunction)
-- Only replaces URLs that ends with "png", "jpg" or "jpeg" (no query strings either)    ($urlReplacerFunction)
+- The modified URL is the same as the original, with ".webp" appended (to change, override the *replaceUrl* function)
+- Only replaces URLs that ends with "png", "jpg" or "jpeg" (no query strings either) (to change, override the *replaceUrl* function)
+- Attribute search/replace limits to these tags: <img>, <source>, <input> and <iframe> (to change, override the *$searchInTags* property)
+- Attribute search/replace limits to these attributes: "src", "src-set" and any attribute starting with "data-" (to change, override the *attributeFilter* function)
+- Urls inside styles are replaced too (*background-image* and *background* properties)

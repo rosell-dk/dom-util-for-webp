@@ -23,13 +23,13 @@ use Sunra\PhpSimple\HtmlDomParser;
  * http://htmlpurifier.org/
  * https://stackoverflow.com/questions/3577641/how-do-you-parse-and-process-html-xml-in-php
  *
- *  Behaviour can be customized by setting the public variables ($searchInTags, $urlReplacerFunction, etc)
+ *  Behaviour can be customized by overriding the public methods (replaceUrl, $searchInTags, etc)
  *
  *  Default behaviour:
- *  - The modified URL is the same as the original, with ".webp" appended                   ($urlReplacerFunction)
+ *  - The modified URL is the same as the original, with ".webp" appended                   (replaceUrl)
  *  - Limits to these tags: <img>, <source>, <input> and <iframe>                           ($searchInTags)
- *  - Limits to these attributes: "src", "src-set" and any attribute starting with "data-"  ($attributeFilterFunction)
- *  - Only replaces URLs that ends with "png", "jpg" or "jpeg" (no query strings either)    ($urlReplacerFunction)
+ *  - Limits to these attributes: "src", "src-set" and any attribute starting with "data-"  (attributeFilter)
+ *  - Only replaces URLs that ends with "png", "jpg" or "jpeg" (no query strings either)    (replaceUrl)
  *
  *
  */
@@ -37,22 +37,23 @@ class ImageUrlReplacer
 {
 
     public static $searchInTags = ['img', 'source', 'input', 'iframe'];
-    public static $attributeFilterFunction = 'self::attributeFilter';
-    public static $urlReplacerFunction = 'self::replaceUrl';
-    //public static $urlValidatorFunction = 'self::isValidUrl';
-    public static $handleAttributeFunction = 'self::handleAttribute';
-    public static $processCSSFunction = 'self::processCSS';
 
     /**
      *
-     * @return webp url or same url as passed in if it should not be modified
+     * @return webp url or, if URL should not be changed, return nothing
      **/
-    public static function replaceUrl($url)
+    public function replaceUrl($url)
     {
         if (!preg_match('#(png|jpe?g)$#', $url)) {
-            return $url;
+            return;
         }
         return $url . '.webp';
+    }
+
+    public function replaceUrlOr($url, $returnValueIfDenied)
+    {
+        $url = $this->replaceUrl($url);
+        return (isset($url) ? $url : $returnValueIfDenied);
     }
 
     /*
@@ -61,12 +62,12 @@ class ImageUrlReplacer
         return preg_match('#(png|jpe?g)$#', $url);
     }*/
 
-    public static function handleSrc($attrValue)
+    public function handleSrc($attrValue)
     {
-        return call_user_func(self::$urlReplacerFunction, $attrValue);
+        return $this->replaceUrlOr($attrValue, $attrValue);
     }
 
-    public static function handleSrcSet($attrValue)
+    public function handleSrcSet($attrValue)
     {
         // $attrValue is ie: <img data-x="1.jpg 1000w, 2.jpg">
         $srcsetArr = explode(',', $attrValue);
@@ -81,15 +82,15 @@ class ImageUrlReplacer
                 $width = null;
             }
 
-            $webpUrl = call_user_func(self::$urlReplacerFunction, $src);
-            if ($webpUrl != $src) {
+            $webpUrl = $this->replaceUrlOr($src, false);
+            if ($webpUrl !== false) {
                 $srcsetArr[$i] = $webpUrl . (isset($width) ? ' ' . $width : '');
             }
         }
         return implode(', ', $srcsetArr);
     }
 
-    public static function looksLikeSrcSet($value)
+    public function looksLikeSrcSet($value)
     {
         if (preg_match('#\s\d*w#', $value)) {
             return true;
@@ -97,7 +98,7 @@ class ImageUrlReplacer
         return false;
     }
 
-    public static function handleAttribute($value)
+    public function handleAttribute($value)
     {
         if (self::looksLikeSrcSet($value)) {
             return self::handleSrcSet($value);
@@ -105,7 +106,7 @@ class ImageUrlReplacer
         return self::handleSrc($value);
     }
 
-    public static function attributeFilter($attrName)
+    public function attributeFilter($attrName)
     {
         if (($attrName == 'src') || ($attrName == 'srcset') || (strpos($attrName, 'data-') === 0)) {
             return true;
@@ -113,13 +114,13 @@ class ImageUrlReplacer
         return false;
     }
 
-    public static function processCSSRegExCallback($matches)
+    public function processCSSRegExCallback($matches)
     {
         list($all, $pre, $quote, $url, $post) = $matches;
-        return $pre . call_user_func(self::$urlReplacerFunction, $url) . $post ;
+        return $pre . $this->replaceUrlOr($url, $url) . $post;
     }
 
-    public static function processCSS($css)
+    public function processCSS($css)
     {
         $declarations = explode(';', $css);
         foreach ($declarations as $i => &$declaration) {
@@ -140,9 +141,7 @@ class ImageUrlReplacer
         return implode(';', $declarations);
     }
 
-    /* Main replacer function */
-
-    public static function replace($html)
+    public function replaceHtml($html)
     {
         if ($html == '') {
             return '';
@@ -150,9 +149,10 @@ class ImageUrlReplacer
 
         // https://stackoverflow.com/questions/4812691/preserve-line-breaks-simple-html-dom-parser
 
-        // function str_get_html($str, $lowercase=true, $forceTagsClosed=true, $target_charset = DEFAULT_TARGET_CHARSET, $stripRN=true, $defaultBRText=DEFAULT_BR_TEXT, $defaultSpanText=DEFAULT_SPAN_TEXT)
+        // function str_get_html($str, $lowercase=true, $forceTagsClosed=true, $target_charset = DEFAULT_TARGET_CHARSET,
+        //    $stripRN=true, $defaultBRText=DEFAULT_BR_TEXT, $defaultSpanText=DEFAULT_SPAN_TEXT)
 
-        $dom = HtmlDomParser::str_get_html( $html, false, false, 'UTF-8', false);
+        $dom = HtmlDomParser::str_get_html($html, false, false, 'UTF-8', false);
 
         // Replace attributes (src, srcset, data-src, etc)
         foreach (self::$searchInTags as $tagName) {
@@ -160,8 +160,8 @@ class ImageUrlReplacer
             foreach ($elems as $index => $elem) {
                 $attributes = $elem->getAllAttributes();
                 foreach ($elem->getAllAttributes() as $attrName => $attrValue) {
-                    if (call_user_func(self::$attributeFilterFunction, $attrName)) {
-                        $elem->setAttribute($attrName, call_user_func(self::$handleAttributeFunction, $attrValue));
+                    if ($this->attributeFilter($attrName)) {
+                        $elem->setAttribute($attrName, $this->handleAttribute($attrValue));
                     }
                 }
             }
@@ -170,7 +170,7 @@ class ImageUrlReplacer
         // Replace <style> elements
         $elems = $dom->find('style');
         foreach ($elems as $index => $elem) {
-            $css = call_user_func(self::$processCSSFunction, $elem->innertext);
+            $css = $this->processCSS($elem->innertext);
             if ($css != $elem->innertext) {
                 $elem->innertext = $css;
             }
@@ -179,7 +179,7 @@ class ImageUrlReplacer
         // Replace "style attributes
         $elems = $dom->find('*[style]');
         foreach ($elems as $index => $elem) {
-            $css = call_user_func(self::$processCSSFunction, $elem->style);
+            $css = $this->processCSS($elem->style);
             if ($css != $elem->style) {
                 $elem->style = $css;
             }
@@ -188,4 +188,10 @@ class ImageUrlReplacer
         return $dom->save();
     }
 
+    /* Main replacer function */
+    public static function replace($html)
+    {
+        $iur = new static();
+        return $iur->replaceHtml($html);
+    }
 }

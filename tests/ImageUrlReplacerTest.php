@@ -9,20 +9,58 @@
 
 namespace DOMUtilForWebPTests;
 
-//use WebPConvert\WebPConvert;
 use PHPUnit\Framework\TestCase;
 use Sunra\PhpSimple\HtmlDomParser;
-
 use DOMUtilForWebP\ImageUrlReplacer;
-//use DOMUtilForWebPTests\ImageUrlReplacerExtended;
+
+class ImageUrlReplacerPassThrough extends ImageUrlReplacer
+{
+    public function handleAttribute($attrValue) {
+        return $attrValue;
+    }
+}
+
+class ImageUrlReplacerStar extends ImageUrlReplacer
+{
+    public function handleAttribute($attrValue) {
+        return "*";
+    }
+}
+
+class ImageUrlReplacerAppendWebP extends ImageUrlReplacer
+{
+    public function handleAttribute($attrValue) {
+        return $attrValue . '.webp';
+    }
+}
+
+class ImageUrlReplacerLooksLikeSrcSet extends ImageUrlReplacer
+{
+    public function handleAttribute($attrValue) {
+        return $this->looksLikeSrcSet($attrValue) ? 'yes' : 'no';
+    }
+}
+
+class ImageUrlReplacerCustomReplacer extends ImageUrlReplacer
+{
+    public function replaceUrl($url) {
+        return $url . '.***';
+    }
+}
+
+class ImageUrlReplacerCustomReplacer2 extends ImageUrlReplacer
+{
+    public function replaceUrl($url) {
+        if (!preg_match('#(png|jpe?g|gif)$#', $url)) {  // here we also accept gif
+            return;
+        }
+        return $url . '.webp';
+    }
+}
+
 
 class ImageUrlReplacerTest extends TestCase
 {
-
-    public static function passThrough($str) {
-        return $str;
-    }
-
 
     public function testUntouched()
     {
@@ -44,17 +82,9 @@ class ImageUrlReplacerTest extends TestCase
             "① <p>并來朝貢</p>"
         ];
 
-
-
-        ImageUrlReplacer::$handleAttributeFunction = '\DOMUtilForWebPTests\ImageUrlReplacerTest::passThrough';
-
         foreach ($untouchedTests as $html) {
-            $this->assertEquals($html, ImageUrlReplacer::replace($html));
+            $this->assertEquals($html, ImageUrlReplacerPassThrough::replace($html));
         }
-    }
-
-    public static function star($str) {
-        return '*';
     }
 
     public function testBasic1()
@@ -72,17 +102,12 @@ class ImageUrlReplacerTest extends TestCase
             ['<并來><img data-x="aoeu"></并來>', '<并來><img data-x="*"></并來>'],
         ];
 
-        ImageUrlReplacer::$handleAttributeFunction = '\DOMUtilForWebPTests\ImageUrlReplacerTest::star';
-
         foreach ($starTests as list($html, $expectedOutput)) {
-            $output = ImageUrlReplacer::replace($html);
+            $output = ImageUrlReplacerStar::replace($html);
             $this->assertEquals($expectedOutput, $output);
         }
     }
 
-    public static function appendWebP($str) {
-        return $str . '.webp';
-    }
 
     public function testBasic2()
     {
@@ -108,17 +133,12 @@ class ImageUrlReplacerTest extends TestCase
 //            ['<img src="http://example.com/102.jpg" srcset="http://example.com/103.jpg 1000w">', '<img src="http://example.com/102.jpg.webp" srcset="http://example.com/103.jpg.webp 1000w">']
         ];
 
-        ImageUrlReplacer::$handleAttributeFunction = '\DOMUtilForWebPTests\ImageUrlReplacerTest::appendWebP';
         foreach ($appendWebPTests as list($html, $expectedOutput)) {
-            $output = ImageUrlReplacer::replace($html);
+            $output = ImageUrlReplacerAppendWebP::replace($html);
             $this->assertEquals($expectedOutput, $output);
         }
     }
 
-    public static function isSrcSetOut($value)
-    {
-        return ImageUrlReplacer::looksLikeSrcSet($value) ? 'yes' : 'no';
-    }
 
     public function testSrcSetDetection()
     {
@@ -130,54 +150,38 @@ class ImageUrlReplacerTest extends TestCase
             ['<img data-x="5.jpg 1000w, 6.jpg">', '<img data-x="yes">'],
         ];
 
-        ImageUrlReplacer::$handleAttributeFunction = '\DOMUtilForWebPTests\ImageUrlReplacerTest::isSrcSetOut';
         foreach ($isSrcSettests as list($html, $expectedOutput)) {
-            $output = ImageUrlReplacer::replace($html);
+            $output = ImageUrlReplacerLooksLikeSrcSet::replace($html);
             $this->assertEquals($expectedOutput, $output);
         }
     }
 
-    public static function customUrlReplacer($url)
-    {
-        return $url . '.***';
-    }
 
-    public function testCustomUrlProcessor()
+    public function testCustomUrlReplacer()
     {
         $tests = [
             ['<img data-x="1.jpg">', '<img data-x="1.jpg.***">'],
         ];
-        ImageUrlReplacer::$handleAttributeFunction = 'self::handleAttribute';
-        ImageUrlReplacer::$urlReplacerFunction = '\DOMUtilForWebPTests\ImageUrlReplacerTest::customUrlReplacer';
 
         foreach ($tests as list($html, $expectedOutput)) {
-            $output = ImageUrlReplacer::replace($html);
+            $output = ImageUrlReplacerCustomReplacer::replace($html);
             $this->assertEquals($expectedOutput, $output);
         }
     }
 
-/*
-    public function customUrlValidator($url)
-    {
-        return preg_match('#(png|jpe?g|gif)$#', $url);  // here we also accept gif
-    }
-
-
-    public function testCustomUrlValidator()
+    public function testCustomUrlReplacer2()
     {
         $tests = [
             ['<img src="1.gif">', '<img src="1.gif.webp">'],    // gif is alright with in this custom validator
             ['<img src="1.buff">', '<img src="1.buff">'],
         ];
-        ImageUrlReplacer::$handleAttributeFunction = 'self::handleAttribute';
-        ImageUrlReplacer::$urlReplacerFunction = 'self::replaceUrl';
-        ImageUrlReplacer::$urlValidatorFunction = '\DOMUtilForWebPTests\ImageUrlReplacerTest::customUrlValidator';
 
         foreach ($tests as list($html, $expectedOutput)) {
-            $output = ImageUrlReplacer::replace($html);
+            $output = ImageUrlReplacerCustomReplacer2::replace($html);
             $this->assertEquals($expectedOutput, $output);
         }
-    }*/
+    }
+
 
     public function testCSS()
     {
@@ -191,12 +195,6 @@ class ImageUrlReplacerTest extends TestCase
             ['<p style="a:{},background:url(/image.jpg)"></p>', '<p style="a:{},background:url(/image.jpg.webp)"></p>'],
             ["<style>background-image:\nurl(/image.jpg);</style>", "<style>background-image:\nurl(/image.jpg.webp);</style>"],
         ];
-        //ImageUrlReplacer::$handleAttributeFunction = '\DOMUtilForWebPTests\ImageUrlReplacerTest::star';
-        ImageUrlReplacer::$handleAttributeFunction = 'self::handleAttribute';
-        //ImageUrlReplacer::$urlReplacerFunction = 'self::replaceUrl';
-        //ImageUrlReplacer::$urlReplacerFunction = '\DOMUtilForWebPTests\ImageUrlReplacerTest::star';
-        ImageUrlReplacer::$urlReplacerFunction = '\DOMUtilForWebPTests\ImageUrlReplacerTest::appendWebP';
-        //ImageUrlReplacer::$urlValidatorFunction = 'self::urlValidatorFunction';
 
         foreach ($tests as list($html, $expectedOutput)) {
             $output = ImageUrlReplacer::replace($html);
@@ -206,7 +204,6 @@ class ImageUrlReplacerTest extends TestCase
 
     public function testWholeEngine()
     {
-
         $tests = [
             ['<img data-x="1.png">', '<img data-x="1.png.webp">'],
             ['<img data-x="2.jpg 1000w">', '<img data-x="2.jpg.webp 1000w">'],
@@ -214,7 +211,6 @@ class ImageUrlReplacerTest extends TestCase
             ['<img data-x="5.jpg 1000w, 6.jpg">', '<img data-x="5.jpg.webp 1000w, 6.jpg.webp">'],
             ['<img data-x="7.gif 1000w, 8.jpg">', '<img data-x="7.gif 1000w, 8.jpg.webp">'],
             ['<img data-lazy-original="9.jpg">', '<img data-lazy-original="9.jpg.webp">'],
-
         ];
 
         $theseShouldBeLeftUntouchedTests = [
@@ -230,11 +226,6 @@ class ImageUrlReplacerTest extends TestCase
         foreach ($theseShouldBeLeftUntouchedTests as $skipThis) {
             $tests[] = [$skipThis, $skipThis];
         }
-
-        // Use defaults
-        ImageUrlReplacer::$handleAttributeFunction = 'self::handleAttribute';
-        ImageUrlReplacer::$urlReplacerFunction = 'self::replaceUrl';
-        //ImageUrlReplacer::$urlValidatorFunction = 'self::isValidUrl';
 
         foreach ($tests as list($html, $expectedOutput)) {
             $output = ImageUrlReplacer::replace($html);
