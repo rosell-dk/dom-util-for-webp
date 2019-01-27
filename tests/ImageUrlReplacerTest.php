@@ -24,7 +24,7 @@ class ImageUrlReplacerTest extends TestCase
     }
 
 
-    public static function testUntouched()
+    public function testUntouched()
     {
 
         // Here we basically test that the DOM manipulation tool is gentle and doesn't alter
