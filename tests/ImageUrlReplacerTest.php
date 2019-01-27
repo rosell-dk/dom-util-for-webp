@@ -19,12 +19,12 @@ use DOMUtilForWebP\ImageUrlReplacer;
 class ImageUrlReplacerTest extends TestCase
 {
 
-    public function passThrough($str) {
+    public static function passThrough($str) {
         return $str;
     }
 
 
-    public function testUntouched()
+    public static function testUntouched()
     {
 
         // Here we basically test that the DOM manipulation tool is gentle and doesn't alter
@@ -53,7 +53,7 @@ class ImageUrlReplacerTest extends TestCase
         }
     }
 
-    public function star($str) {
+    public static function star($str) {
         return '*';
     }
 
@@ -80,7 +80,7 @@ class ImageUrlReplacerTest extends TestCase
         }
     }
 
-    public function appendWebP($str) {
+    public static function appendWebP($str) {
         return $str . '.webp';
     }
 
@@ -115,7 +115,7 @@ class ImageUrlReplacerTest extends TestCase
         }
     }
 
-    public function isSrcSetOut($value)
+    public static function isSrcSetOut($value)
     {
         return ImageUrlReplacer::looksLikeSrcSet($value) ? 'yes' : 'no';
     }
@@ -137,7 +137,7 @@ class ImageUrlReplacerTest extends TestCase
         }
     }
 
-    public function customUrlReplacer($url)
+    public static function customUrlReplacer($url)
     {
         return $url . '.***';
     }
