@@ -43,16 +43,11 @@ class ImageUrlReplacer
     public static $handleAttributeFunction = 'self::handleAttribute';
     public static $processCSSFunction = 'self::processCSS';
 
-    public function hello()
-    {
-        return 'hi';
-    }
-
     /**
      *
      * @return webp url or same url as passed in if it should not be modified
      **/
-    public function replaceUrl($url)
+    public static function replaceUrl($url)
     {
         if (!preg_match('#(png|jpe?g)$#', $url)) {
             return $url;
@@ -66,12 +61,12 @@ class ImageUrlReplacer
         return preg_match('#(png|jpe?g)$#', $url);
     }*/
 
-    public function handleSrc($attrValue)
+    public static function handleSrc($attrValue)
     {
         return call_user_func(self::$urlReplacerFunction, $attrValue);
     }
 
-    public function handleSrcSet($attrValue)
+    public static function handleSrcSet($attrValue)
     {
         // $attrValue is ie: <img data-x="1.jpg 1000w, 2.jpg">
         $srcsetArr = explode(',', $attrValue);
@@ -94,7 +89,7 @@ class ImageUrlReplacer
         return implode(', ', $srcsetArr);
     }
 
-    public function looksLikeSrcSet($value)
+    public static function looksLikeSrcSet($value)
     {
         if (preg_match('#\s\d*w#', $value)) {
             return true;
@@ -102,7 +97,7 @@ class ImageUrlReplacer
         return false;
     }
 
-    public function handleAttribute($value)
+    public static function handleAttribute($value)
     {
         if (self::looksLikeSrcSet($value)) {
             return self::handleSrcSet($value);
@@ -110,7 +105,7 @@ class ImageUrlReplacer
         return self::handleSrc($value);
     }
 
-    public function attributeFilter($attrName)
+    public static function attributeFilter($attrName)
     {
         if (($attrName == 'src') || ($attrName == 'srcset') || (strpos($attrName, 'data-') === 0)) {
             return true;
@@ -118,13 +113,13 @@ class ImageUrlReplacer
         return false;
     }
 
-    public function processCSSRegExCallback($matches)
+    public static function processCSSRegExCallback($matches)
     {
         list($all, $pre, $quote, $url, $post) = $matches;
         return $pre . call_user_func(self::$urlReplacerFunction, $url) . $post ;
     }
 
-    public function processCSS($css)
+    public static function processCSS($css)
     {
         $declarations = explode(';', $css);
         foreach ($declarations as $i => &$declaration) {
@@ -147,7 +142,7 @@ class ImageUrlReplacer
 
     /* Main replacer function */
 
-    public function replace($html)
+    public static function replace($html)
     {
         if ($html == '') {
             return '';
