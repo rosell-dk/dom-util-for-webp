@@ -58,6 +58,19 @@ class ImageUrlReplacerCustomReplacer2 extends ImageUrlReplacer
     }
 }
 
+class ImageUrlReplacerCustomAttributeFilter extends ImageUrlReplacer
+{
+
+    public function attributeFilter($attrName) {
+        // Don't allow any "data-" attribute, but limit to attributes that smells like they are used for images
+        // The following rule matches all attributes used for lazy loading images that we know of
+        return preg_match('#^(src|srcset|(data-[^=]*(lazy|small|slide|img|large|src|thumb|source|set|bg-url)[^=]*))$#i', $attrName);
+
+        // If you want to limit it further, only allowing attributes known to be used for lazy load,
+        // use the following regex instead:
+        //return preg_match('#^(src|srcset|data-(src|srcset|cvpsrc|cvpset|thumb|bg-url|large_image|lazyload|source-url|srcsmall|srclarge|srcfull|slide-img|lazy-original))$#i', $attrName);
+    }
+}
 
 class ImageUrlReplacerTest extends TestCase
 {
@@ -183,6 +196,24 @@ class ImageUrlReplacerTest extends TestCase
     }
 
 
+    public function testCustomAttributeFilter()
+    {
+        $tests = [
+            ['<img data-src="1.jpg">', '<img data-src="1.jpg.webp">'],
+            ['<img data-iframe="2.jpg">', '<img data-iframe="2.jpg">'],
+            ['<img data-lazyload="3.jpg">', '<img data-lazyload="3.jpg.webp">'],
+            ['<img data-bg-url="4.jpg">', '<img data-bg-url="4.jpg.webp">'],
+            ['<img SRC="5.jpg">', '<img SRC="5.jpg.webp">'],
+            ['<img DATA-SRC="6.jpg">', '<img DATA-SRC="6.jpg.webp">'],
+        ];
+
+        foreach ($tests as list($html, $expectedOutput)) {
+            $output = ImageUrlReplacerCustomAttributeFilter::replace($html);
+            $this->assertEquals($expectedOutput, $output);
+        }
+    }
+
+
     public function testCSS()
     {
         $tests = [
@@ -211,6 +242,10 @@ class ImageUrlReplacerTest extends TestCase
             ['<img data-x="5.jpg 1000w, 6.jpg">', '<img data-x="5.jpg.webp 1000w, 6.jpg.webp">'],
             ['<img data-x="7.gif 1000w, 8.jpg">', '<img data-x="7.gif 1000w, 8.jpg.webp">'],
             ['<img data-lazy-original="9.jpg">', '<img data-lazy-original="9.jpg.webp">'],
+            ['<img SRC="10.jpg">', '<img SRC="10.jpg.webp">'],
+
+            //TODO: Handle:
+            //['<IMG SRC="11.jpg">', '<IMG SRC="11.jpg.webp">'],
         ];
 
         $theseShouldBeLeftUntouchedTests = [
