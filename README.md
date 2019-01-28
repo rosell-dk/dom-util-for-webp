@@ -25,13 +25,14 @@ $modifiedHtml = ImageUrlReplacerCustomReplacer::replace($html);
     <source src="3.gif"> <!-- gifs are skipped in default behaviour -->
     <source src="4.jpg?width=200"> <!-- urls with query string are skipped in default behaviour -->
 </picture>
-<div style="background-image: url('image.jpeg')">
+<div style="background-image: url('image.jpeg')"></div>
 <style>
-#image {
-    background-image: url(image.png);
+#hero {
+    background: lightblue url("image.png") no-repeat fixed center;;
 }
 </style>
 <input type="button" src="1.jpg">
+<img data-src="image.jpg"> <!-- any attribute starting with "data-" are replaced (if it ends with "jpg", "jpeg" or "png"). For lazy-loading -->
 ```
 
 *Output*:
@@ -44,13 +45,14 @@ $modifiedHtml = ImageUrlReplacerCustomReplacer::replace($html);
     <source src="3.gif"> <!-- gifs are skipped in default behaviour -->
     <source src="4.jpg?width=200"> <!-- urls with query string are skipped in default behaviour -->
 </picture>
-<div style="background-image: url('image.jpeg.webp')">
+<div style="background-image: url('image.jpeg.webp')"></div>
 <style>
-#image {
-    background-image: url("image.png.webp");
+#hero {
+    background: lightblue url("image.png.webp") no-repeat fixed center;;
 }
 </style>
 <input type="button" src="1.jpg.webp">
+<img data-src="image.jpg.webp"> <!-- any attribute starting with "data-" are replaced (if it ends with "jpg", "jpeg" or "png"). For lazy-loading -->
 ```
 
 Default behaviour of *ImageUrlReplacer::replace*:
@@ -81,6 +83,16 @@ class ImageUrlReplacerCustomReplacer extends ImageUrlReplacer
         // Simply append ".webp" after current extension.
         // This strategy ensures that "logo.jpg" and "logo.gif" gets counterparts with unique names
         return $url . '.webp';
+    }
+
+    public function attributeFilter($attrName) {
+        // Don't allow any "data-" attribute, but limit to attributes that smells like they are used for images
+        // The following rule matches all attributes used for lazy loading images that we know of
+        return preg_match('#^(src|srcset|(data-[^=]*(lazy|small|slide|img|large|src|thumb|source|set|bg-url)[^=]*))$#i', $attrName);
+
+        // If you want to limit it further, only allowing attributes known to be used for lazy load,
+        // use the following regex instead:
+        //return preg_match('#^(src|srcset|data-(src|srcset|cvpsrc|cvpset|thumb|bg-url|large_image|lazyload|source-url|srcsmall|srclarge|srcfull|slide-img|lazy-original))$#i', $attrName);
     }
 }
 
