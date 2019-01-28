@@ -108,6 +108,7 @@ class ImageUrlReplacer
 
     public function attributeFilter($attrName)
     {
+        $attrName = strtolower($attrName);
         if (($attrName == 'src') || ($attrName == 'srcset') || (strpos($attrName, 'data-') === 0)) {
             return true;
         }
