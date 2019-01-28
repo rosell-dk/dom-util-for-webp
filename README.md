@@ -80,6 +80,8 @@ class ImageUrlReplacerCustomReplacer extends ImageUrlReplacer
             return;
         }
 
+        // PS: You probably want to filter out external images too...
+
         // Simply append ".webp" after current extension.
         // This strategy ensures that "logo.jpg" and "logo.gif" gets counterparts with unique names
         return $url . '.webp';
