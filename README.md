@@ -9,7 +9,7 @@ This library can do two things:
 
 ## 1. Replacing image URLs in HTML
 
-The *ImageUrlReplacer::replace($html)* method accepts a piece of HTML and returns HTML where where all image URLs have been replaced.
+The *ImageUrlReplacer::replace($html)* method accepts a piece of HTML and returns HTML where where all image URLs have been replaced - even those in inline styles.
 
 *Usage:*
 
@@ -17,7 +17,8 @@ The *ImageUrlReplacer::replace($html)* method accepts a piece of HTML and return
 $modifiedHtml = ImageUrlReplacerCustomReplacer::replace($html);
 ```
 
-*Input:*
+The following input:
+
 ```html
 <img src="image.jpg">
 <img src="1.jpg" srcset="2.jpg 1000w">
@@ -37,7 +38,8 @@ $modifiedHtml = ImageUrlReplacerCustomReplacer::replace($html);
 <img data-src="image.jpg"> <!-- any attribute starting with "data-" are replaced (if it ends with "jpg", "jpeg" or "png"). For lazy-loading -->
 ```
 
-*Output*:
+produces the following output:
+
 ```html
 <img src="image.jpg.webp">
 <img src="1.jpg.webp" srcset="2.jpg.webp 1000w">
@@ -119,7 +121,36 @@ Usage:
 $modifiedHtml = PictureTags::replace($html);
 ```
 
-Example:
+Example replacements:
+
+<table>
+    <tr>
+        <th>Input</th>
+        <th>Output</th>
+    </tr>
+    <tr>
+        <td style="vertical-align:top">
+        &lt;img src="1.png"&gt;
+        </td>
+        <td>        
+        &lt;picture class="webpexpress-processed">
+        &nbsp;&nbsp;&nbsp;&nbsp;&lt;source src="1.png.webp" type="image/webp">
+        &nbsp;&nbsp;&nbsp;&nbsp;&lt;source src="1.png">
+        &nbsp;&nbsp;&nbsp;&nbsp;&lt;img src="1.png" class="webpexpress-processed">
+        &lt;/picture>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align:top">
+        ```html
+        <img src="1.png">
+        ```
+        </td>
+        <td>        
+        </td>
+    </tr>
+<table>
+
 
 *Input:*
 ```html
