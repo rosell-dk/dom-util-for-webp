@@ -11,6 +11,8 @@ This library can do two things:
 
 The *ImageUrlReplacer::replace($html)* method accepts a piece of HTML and returns HTML where where all image URLs have been replaced.
 
+*Usage:*
+
 ```php
 $modifiedHtml = ImageUrlReplacerCustomReplacer::replace($html);
 ```
@@ -64,6 +66,9 @@ Default behaviour of *ImageUrlReplacer::replace*:
 
 The behaviour can be modified by extending *ImageUrlReplacer* and overriding public methods such as *replaceUrl*
 
+ImageUrlReplacer uses the  `Sunra\PhpSimple\HtmlDomParser`[library](https://github.com/sunra/php-simple-html-dom-parser) for parsing and modifying HTML. It wraps [simplehtmldom](http://simplehtmldom.sourceforge.net/). Simplehtmldom supports invalid HTML (it does not touch the invalid parts)
+
+
 ### Example: Customized behaviour
 
 ```php
@@ -104,4 +109,44 @@ $modifiedHtml = ImageUrlReplacerCustomReplacer::replace($html);
 
 
 
-## Replacing *&lt;img&gt;* tags with *&lt;picture&gt;* tags, adding webp versions to sources (TODO)
+## Replacing *&lt;img&gt;* tags with *&lt;picture&gt;* tags, adding webp versions to sources
+
+The *PictureTags::replace($html)* method accepts a piece of HTML and returns HTML where where all &lt;img&gt; tags have been replaced with &lt;picture&gt; tags.
+
+Usage:
+
+```php
+$modifiedHtml = PictureTags::replace($html);
+```
+
+Example:
+
+*Input:*
+```html
+<img src="1.png">
+<img srcset="3.jpg 1000w" src="3.jpg">
+<img data-lazy-src="9.jpg">
+```
+
+*Output*:
+```html
+<picture class="webpexpress-processed">
+    <source src="1.png.webp" type="image/webp">
+    <source src="1.png">
+    <img src="1.png" class="webpexpress-processed">
+</picture>
+<picture class="webpexpress-processed">
+    <source srcset="3.jpg.webp 1000w" type="image/webp">
+    <source srcset="3.jpg 1000w">
+    <img srcset="3.jpg 1000w" src="3.jpg" class="webpexpress-processed">
+</picture>
+<picture class="webpexpress-processed">
+    <source data-lazy-src="9.jpg.webp" type="image/webp">
+    <source data-lazy-src="9.jpg">
+    <img data-lazy-src="9.jpg" class="webpexpress-processed">
+</picture>
+```
+
+As with `ImageUrlReplacer`, you can override the *replaceUrl* function. There is however currently no other methods to override.
+
+`PictureTags` currently uses regular expressions to do the replacing. There are plans to change implementation to use `Sunra\PhpSimple\HtmlDomParser`, like our `ImageUrlReplacer` class does.
