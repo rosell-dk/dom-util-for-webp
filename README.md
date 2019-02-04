@@ -4,10 +4,10 @@ Replace image URLs found in HTML
 This library can do two things:
 
 1) Replace image URLs in HTML
-2) Replace *&lt;img&gt;* tags with *&lt;picture&gt;* tags, adding webp versions to sources (TODO)
+2) Replace *&lt;img&gt;* tags with *&lt;picture&gt;* tags, adding webp versions to sources
 
 
-## Replacing image URLs in HTML
+## 1. Replacing image URLs in HTML
 
 The *ImageUrlReplacer::replace($html)* method accepts a piece of HTML and returns HTML where where all image URLs have been replaced.
 
@@ -109,7 +109,7 @@ $modifiedHtml = ImageUrlReplacerCustomReplacer::replace($html);
 
 
 
-## Replacing *&lt;img&gt;* tags with *&lt;picture&gt;* tags, adding webp versions to sources
+## 2. Replacing *&lt;img&gt;* tags with *&lt;picture&gt;* tags, adding webp versions to sources
 
 The *PictureTags::replace($html)* method accepts a piece of HTML and returns HTML where where all &lt;img&gt; tags have been replaced with &lt;picture&gt; tags.
 
