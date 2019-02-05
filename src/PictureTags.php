@@ -77,8 +77,11 @@ class PictureTags
         foreach ($attribute_array as $attribute => $value) {
             $attributes .= $attribute . '="' . $value . '" ';
         }
-        // Removes the extra space after the last attribute
-        return substr($attributes, 0, -1);
+        if ($attributes == '') {
+            return '';
+        }
+        // Removes the extra space after the last attribute. Add space before
+        return ' ' . substr($attributes, 0, -1);
     }
 
     /**
@@ -91,18 +94,22 @@ class PictureTags
         if ( strpos($imgTag, 'webpexpress-processed') ) {
             return $imgTag;
         }
-        $attributes = self::getAttributes($imgTag);
+        $imgAttributes = self::getAttributes($imgTag);
 
-        $srcInfo = self::lazyGet($attributes, 'src');
-        $srcsetInfo = self::lazyGet($attributes, 'srcset');
-        $sizesInfo = self::lazyGet($attributes, 'sizes');
+        $srcInfo = self::lazyGet($imgAttributes, 'src');
+        $srcsetInfo = self::lazyGet($imgAttributes, 'srcset');
+        $sizesInfo = self::lazyGet($imgAttributes, 'sizes');
 
         // We don't wanna have src-ish attributes on the <picture>
-        unset($attributes['src']);
-        unset($attributes['data-src']);
-        unset($attributes['data-lazy-src']);
-        unset($attributes['srcset']);
-        //unset($attributes['sizes']);
+        $pictureAttributes = $imgAttributes;
+        unset($pictureAttributes['src']);
+        unset($pictureAttributes['data-src']);
+        unset($pictureAttributes['data-lazy-src']);
+        unset($pictureAttributes['srcset']);
+        unset($pictureAttributes['sizes']);
+
+        // add the exclude class so if this content is processed again in other filter, the img is not converted again in picture
+        $imgAttributes['class'] = (isset($imgAttributes['class']) ? $imgAttributes['class'] . " " : "") . "webpexpress-processed";
 
         $srcsetWebP = '';
         if ($srcsetInfo['value']) {
@@ -128,16 +135,14 @@ class PictureTags
                 // We have no webps for you, so no reason to create <picture> tag
                 return $imgTag;
             }
-            // add the exclude class so if this content is processed again in other filter, the img is not converted again in picture
-            $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] . " " : "") . "webpexpress-processed";
             $sizesAttr = ($sizesInfo['value'] ? (' ' . $sizesInfo['attrName'] . '="' . $sizesInfo['value'] . '"') : '');
-            return '<picture ' . self::createAttributes($attributes) . '>'
+            return '<picture' . self::createAttributes($pictureAttributes) . '>'
                 . '<source ' . $srcsetInfo['attrName'] . '="' . $srcsetWebP . '"' . $sizesAttr . ' type="image/webp">'
                 . '<source ' . $srcsetInfo['attrName'] . '="' . $srcsetInfo["value"] . '"' . $sizesAttr . '>'
-                . '<img ' . $srcsetInfo['attrName'] . '="' . $srcsetInfo['value'] . '" '
-                . (($srcInfo['attrName'] !== false) ? $srcInfo['attrName'] . '="' . $srcInfo['value'] . '" ' : '')
-                . self::createAttributes($attributes) . '>'
-                //. '<img ' . self::createAttributes($attributes) . '>'
+                //. '<img ' . $srcsetInfo['attrName'] . '="' . $srcsetInfo['value'] . '" '
+                //. (($srcInfo['attrName'] !== false) ? $srcInfo['attrName'] . '="' . $srcInfo['value'] . '" ' : '')
+                //. self::createAttributes($imgAttributes) . '>'
+                . '<img' . self::createAttributes($imgAttributes) . '>'
                 . '</picture>';
 
         } else {
@@ -147,12 +152,11 @@ class PictureTags
                 return $imgTag;
             }
 
-            $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] . " " : "") . "webpexpress-processed";
-            return '<picture ' . self::createAttributes($attributes) . '>'
+            return '<picture' . self::createAttributes($pictureAttributes) . '>'
                 . '<source ' . $srcInfo['attrName'] . '="' . $srcWebP . '" type="image/webp">'
                 . '<source ' . $srcInfo['attrName'] . '="' . $srcInfo["value"] . '">'
-                . '<img ' . $srcInfo['attrName'] . '="' . $srcInfo['value'] . '" ' . self::createAttributes($attributes) . '>'
-                //. '<img ' . self::createAttributes($attributes) . '>'
+                //. '<img ' . $srcInfo['attrName'] . '="' . $srcInfo['value'] . '" ' . self::createAttributes($imgAttributes) . '>'
+                . '<img' . self::createAttributes($imgAttributes) . '>'
                 . '</picture>';
         }
 
