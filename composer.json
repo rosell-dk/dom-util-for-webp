@@ -3,6 +3,7 @@
   "description": "Replace image URLs found in HTML",
   "type": "library",
   "license": "MIT",
+  "minimum-stability": "stable",
   "keywords": ["webp", "replace", "images", "html"],
   "scripts": {
     "ci": [
