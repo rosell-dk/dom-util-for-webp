@@ -32,34 +32,39 @@ class PictureTags
      * @param $attributes  an array of attributes for the element
      * @param $attrName    ie "src", "srcset" or "sizes"
      *
-     * @return [value:.., attrName:...]  (value is the value of the attribute and attrName is the name of the attribute used)
+     * @return [value:.., attrName:...]  (value is the value of the attribute and
+     *                                    attrName is the name of the attribute used)
      *
      */
-    private static function lazyGet($attributes, $attrName) {
+    private static function lazyGet($attributes, $attrName)
+    {
         return array(
             'value' =>
                 (isset($attributes['data-lazy-' . $attrName]) && strlen($attributes['data-lazy-' . $attrName])) ?
                     trim($attributes['data-lazy-' . $attrName])
                     : (isset($attributes['data-' . $attrName]) && strlen($attributes['data-' . $attrName]) ?
                         trim($attributes['data-' . $attrName])
-                        : (isset($attributes[$attrName]) && strlen($attributes[$attrName]) ? trim($attributes[$attrName]) : false)),
+                        : (isset($attributes[$attrName]) && strlen($attributes[$attrName]) ?
+                            trim($attributes[$attrName]) : false)),
             'attrName' =>
-                (isset($attributes['data-lazy-' . $attrName]) && strlen($attributes['data-lazy-' . $attrName])) ? 'data-lazy-' . $attrName
-                    : (isset($attributes['data-' . $attrName]) && strlen($attributes['data-' . $attrName]) ? 'data-' . $attrName
+                (isset($attributes['data-lazy-' . $attrName]) && strlen($attributes['data-lazy-' . $attrName])) ?
+                    'data-lazy-' . $attrName
+                    : (isset($attributes['data-' . $attrName]) && strlen($attributes['data-' . $attrName]) ?
+                        'data-' . $attrName
                         : (isset($attributes[$attrName]) && strlen($attributes[$attrName]) ? $attrName : false))
         );
     }
 
-    private static function getAttributes( $image_node )
+    private static function getAttributes($image_node)
     {
-        if(function_exists("mb_convert_encoding")) {
+        if (function_exists("mb_convert_encoding")) {
             $image_node = mb_convert_encoding($image_node, 'HTML-ENTITIES', 'UTF-8');
         }
         $dom = new \DOMDocument();
         @$dom->loadHTML($image_node);
         $image = $dom->getElementsByTagName('img')->item(0);
         $attributes = array();
-        foreach ( $image->attributes as $attr ) {
+        foreach ($image->attributes as $attr) {
                 $attributes[$attr->nodeName] = $attr->nodeValue;
         }
         return $attributes;
@@ -87,11 +92,12 @@ class PictureTags
     /**
      *  Replace <image> tag with <picture> tag.
      */
-    private function replaceCallback($match) {
+    private function replaceCallback($match)
+    {
         $imgTag = $match[0];
 
         // Do nothing with images that have the 'webpexpress-processed' class.
-        if ( strpos($imgTag, 'webpexpress-processed') ) {
+        if (strpos($imgTag, 'webpexpress-processed')) {
             return $imgTag;
         }
         $imgAttributes = self::getAttributes($imgTag);
@@ -108,12 +114,13 @@ class PictureTags
         unset($pictureAttributes['srcset']);
         unset($pictureAttributes['sizes']);
 
-        // add the exclude class so if this content is processed again in other filter, the img is not converted again in picture
-        $imgAttributes['class'] = (isset($imgAttributes['class']) ? $imgAttributes['class'] . " " : "") . "webpexpress-processed";
+        // add the exclude class so if this content is processed again in other filter,
+        // the img is not converted again in picture
+        $imgAttributes['class'] = (isset($imgAttributes['class']) ? $imgAttributes['class'] . " " : "") .
+            "webpexpress-processed";
 
         $srcsetWebP = '';
         if ($srcsetInfo['value']) {
-
             $srcsetArr = explode(', ', $srcsetInfo["value"]);
             $srcsetArrWebP = [];
             foreach ($srcsetArr as $i => $srcSetEntry) {
@@ -131,7 +138,7 @@ class PictureTags
                 }
             }
             $srcsetWebP = implode(', ', $srcsetArrWebP);
-            if (strlen($srcsetWebP) == 0)  {
+            if (strlen($srcsetWebP) == 0) {
                 // We have no webps for you, so no reason to create <picture> tag
                 return $imgTag;
             }
@@ -139,12 +146,8 @@ class PictureTags
             return '<picture' . self::createAttributes($pictureAttributes) . '>'
                 . '<source ' . $srcsetInfo['attrName'] . '="' . $srcsetWebP . '"' . $sizesAttr . ' type="image/webp">'
                 . '<source ' . $srcsetInfo['attrName'] . '="' . $srcsetInfo["value"] . '"' . $sizesAttr . '>'
-                //. '<img ' . $srcsetInfo['attrName'] . '="' . $srcsetInfo['value'] . '" '
-                //. (($srcInfo['attrName'] !== false) ? $srcInfo['attrName'] . '="' . $srcInfo['value'] . '" ' : '')
-                //. self::createAttributes($imgAttributes) . '>'
                 . '<img' . self::createAttributes($imgAttributes) . '>'
                 . '</picture>';
-
         } else {
             $srcWebP = $this->replaceUrlOr($srcInfo['value'], false);
             if ($srcWebP === false) {
@@ -155,17 +158,16 @@ class PictureTags
             return '<picture' . self::createAttributes($pictureAttributes) . '>'
                 . '<source ' . $srcInfo['attrName'] . '="' . $srcWebP . '" type="image/webp">'
                 . '<source ' . $srcInfo['attrName'] . '="' . $srcInfo["value"] . '">'
-                //. '<img ' . $srcInfo['attrName'] . '="' . $srcInfo['value'] . '" ' . self::createAttributes($imgAttributes) . '>'
                 . '<img' . self::createAttributes($imgAttributes) . '>'
                 . '</picture>';
         }
-
     }
 
     /*
      *
      */
-    public function replaceHtml($content) {
+    public function replaceHtml($content)
+    {
         // TODO: We should not replace <img> tags that are inside <picture> tags already, now should we?
         return preg_replace_callback('/<img[^>]*>/i', array($this, 'replaceCallback'), $content);
     }
@@ -176,6 +178,4 @@ class PictureTags
         $pt = new static();
         return $pt->replaceHtml($html);
     }
-
-
 }
