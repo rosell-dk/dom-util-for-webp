@@ -243,6 +243,7 @@ class ImageUrlReplacerTest extends TestCase
             ['<img data-x="7.gif 1000w, 8.jpg">', '<img data-x="7.gif 1000w, 8.jpg.webp">'],
             ['<img data-lazy-original="9.jpg">', '<img data-lazy-original="9.jpg.webp">'],
             ['<img SRC="10.jpg">', '<img SRC="10.jpg.webp">'],
+            ['<figure class="wp-block-image"><img src="http://we17/subdir/wp-content/uploads/2018/12/tegning5.jpg" alt="" class="wp-image-6" srcset="http://we17/subdir/wp-content/uploads/2018/12/tegning5.jpg 492w, http://we17/subdir/wp-content/uploads/2018/12/tegning5-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></figure>', '<figure class="wp-block-image"><img src="http://we17/subdir/wp-content/uploads/2018/12/tegning5.jpg.webp" alt="" class="wp-image-6" srcset="http://we17/subdir/wp-content/uploads/2018/12/tegning5.jpg.webp 492w, http://we17/subdir/wp-content/uploads/2018/12/tegning5-300x265.jpg.webp 300w" sizes="(max-width: 492px) 100vw, 492px"></figure>']
 
             //TODO: Handle:
             //['<IMG SRC="11.jpg">', '<IMG SRC="11.jpg.webp">'],
