@@ -2,6 +2,7 @@
 
 namespace DOMUtilForWebP;
 
+use Sunra\PhpSimple\HtmlDomParser;
 /**
  * Class PictureTags - convert an <img> tag to a <picture> tag and add the webp versions of the images
  * Based this code on code from the ShortPixel plugin, which used code from Responsify WP plugin
@@ -55,19 +56,32 @@ class PictureTags
         );
     }
 
-    private static function getAttributes($image_node)
+    private static function getAttributes($html)
     {
         if (function_exists("mb_convert_encoding")) {
-            $image_node = mb_convert_encoding($image_node, 'HTML-ENTITIES', 'UTF-8');
+            $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
         }
-        $dom = new \DOMDocument();
-        @$dom->loadHTML($image_node);
-        $image = $dom->getElementsByTagName('img')->item(0);
-        $attributes = array();
-        foreach ($image->attributes as $attr) {
-                $attributes[$attr->nodeName] = $attr->nodeValue;
+        if (class_exists('\\DOMDocument')) {
+            $dom = new \DOMDocument();
+            @$dom->loadHTML($html);
+            $image = $dom->getElementsByTagName('img')->item(0);
+            $attributes = [];
+            foreach ($image->attributes as $attr) {
+                    $attributes[$attr->nodeName] = $attr->nodeValue;
+            }
+            return $attributes;
+        } else {
+            $dom = HtmlDomParser::str_get_html($html, false, false, 'UTF-8', false);
+            $elems = $dom->find('img,IMG');
+            foreach ($elems as $index => $elem) {
+                $attributes = [];
+                foreach ($elem->getAllAttributes() as $attrName => $attrValue) {
+                    $attributes[strtolower($attrName)] = $attrValue;
+                }
+                return $attributes;
+            }
+            return [];
         }
-        return $attributes;
     }
 
     /**
