@@ -6,6 +6,7 @@ This library can do two things:
 1) Replace image URLs in HTML
 2) Replace *&lt;img&gt;* tags with *&lt;picture&gt;* tags, adding webp versions to sources
 
+To setup with composer, run ```composer require rosell-dk/dom-util-for-webp```.
 
 ## 1. Replacing image URLs in HTML
 
@@ -130,6 +131,9 @@ $modifiedHtml = PictureTags::replace($html);
 <img src="1.png">
 <img srcset="3.jpg 1000w" src="3.jpg">
 <img data-lazy-src="9.jpg">
+<figure class="wp-block-image">
+    <img src="12.jpg" alt="" class="wp-image-6" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px">
+</figure>
 ```
 
 *Output*:
@@ -149,6 +153,13 @@ $modifiedHtml = PictureTags::replace($html);
     <source data-lazy-src="9.jpg">
     <img data-lazy-src="9.jpg" class="webpexpress-processed">
 </picture>
+<figure class="wp-block-image">
+    <picture alt="" class="wp-image-6">
+        <source srcset="12.jpg.webp 492w, 12-300x265.jpg.webp 300w" sizes="(max-width: 492px) 100vw, 492px" type="image/webp">
+        <source srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px">
+        <img src="12.jpg" alt="" class="wp-image-6 webpexpress-processed" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px">
+    </picture>
+</figure>
 ```
 
 As with `ImageUrlReplacer`, you can override the *replaceUrl* function. There is however currently no other methods to override.
