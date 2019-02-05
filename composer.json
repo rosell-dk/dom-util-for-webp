@@ -19,7 +19,7 @@
     "cs-dry": "php-cs-fixer fix --dry-run --diff",
     "test": "phpunit",
     "phpcs": "phpcs --standard=PSR2",
-    "phpcs-all": "phpcs --standard=PSR2 src",
+    "phpcs-all": "phpcs --standard=PSR2 --ignore=src/simple_html_dom/simple_html_dom.inc src",
     "phpcbf": "phpcbf --standard=PSR2"
   },
   "extra": {
@@ -54,6 +54,5 @@
     "sort-packages": true
   },
   "require": {
-    "sunra/php-simple-html-dom-parser": "^1.5"
   }
 }

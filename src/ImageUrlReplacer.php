@@ -2,7 +2,7 @@
 
 namespace DOMUtilForWebP;
 
-use Sunra\PhpSimple\HtmlDomParser;
+//use Sunra\PhpSimple\HtmlDomParser;
 
 /**
  *  Highly configurable class for replacing image URLs in HTML (both src and srcset syntax)
@@ -10,18 +10,8 @@ use Sunra\PhpSimple\HtmlDomParser;
  *  Based on http://simplehtmldom.sourceforge.net/ - a library for easily manipulating HTML by means of a DOM.
  *  The great thing about this library is that it supports working on invalid HTML and it only applies the changes you
  *  make - very gently.
- *  We are using this packaged version:  https://packagist.org/packages/sunra/php-simple-html-dom-parser
  *
- * TODO: https://github.com/paquettg/php-html-parser
- * TODO: https://github.com/Masterminds/html5-php
- * TODO: or perhaps https://packagist.org/packages/symfony/dom-crawler
- * TODO: Other encodings than UTF-8
- * TODO: Other languages
- * TODO: Only use the parser on bits of html, not whole html. Ie use preg to find tags, and THEN parse
  * TODO: Check out how ewww does it
- * https://github.com/Masterminds/html5-php/wiki/End-User-Submitted-Markup
- * http://htmlpurifier.org/
- * https://stackoverflow.com/questions/3577641/how-do-you-parse-and-process-html-xml-in-php
  *
  *  Behaviour can be customized by overriding the public methods (replaceUrl, $searchInTags, etc)
  *
@@ -153,7 +143,8 @@ class ImageUrlReplacer
         // function str_get_html($str, $lowercase=true, $forceTagsClosed=true, $target_charset = DEFAULT_TARGET_CHARSET,
         //    $stripRN=true, $defaultBRText=DEFAULT_BR_TEXT, $defaultSpanText=DEFAULT_SPAN_TEXT)
 
-        $dom = HtmlDomParser::str_get_html($html, false, false, 'UTF-8', false);
+        //$dom = HtmlDomParser::str_get_html($html, false, false, 'UTF-8', false);
+        $dom = str_get_html($html, false, false, 'UTF-8', false);
 
         // Replace attributes (src, srcset, data-src, etc)
         foreach (self::$searchInTags as $tagName) {
@@ -192,6 +183,9 @@ class ImageUrlReplacer
     /* Main replacer function */
     public static function replace($html)
     {
+        if (!function_exists('str_get_html')) {
+            require_once 'simple_html_dom/simple_html_dom.inc';
+        }
         $iur = new static();
         return $iur->replaceHtml($html);
     }
