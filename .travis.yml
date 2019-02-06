@@ -9,9 +9,7 @@ php:
 
 dist: xenial
 
-os:
-  - linux
-  - osx
+os: linux
 
 sudo: false
 
