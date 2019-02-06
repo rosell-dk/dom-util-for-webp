@@ -1,5 +1,8 @@
 # dom-util-for-webp
-Replace image URLs found in HTML
+
+[![Build Status](https://travis-ci.org/rosell-dk/dom-util-for-webp.png?branch=master)](https://travis-ci.org/rosell-dk/dom-util-for-webp)
+
+*Replace image URLs found in HTML*
 
 This library can do two things:
 
