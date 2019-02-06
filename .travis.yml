@@ -7,7 +7,9 @@ php:
   - 7.2
   - 7.3
 
-dist: trusty
+dist:
+  - trusty
+  - xenial
 
 sudo: false
 
