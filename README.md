@@ -112,8 +112,6 @@ $modifiedHtml = ImageUrlReplacerCustomReplacer::replace($html);
 ```
 
 
-
-
 ## 2. Replacing *&lt;img&gt;* tags with *&lt;picture&gt;* tags
 
 The *PictureTags::replace($html)* method accepts a piece of HTML and returns HTML where where all &lt;img&gt; tags have been replaced with &lt;picture&gt; tags, adding webp versions to sources
