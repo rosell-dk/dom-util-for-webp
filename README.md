@@ -18,7 +18,7 @@ The *ImageUrlReplacer::replace($html)* method accepts a piece of HTML and return
 *Usage:*
 
 ```php
-$modifiedHtml = ImageUrlReplacerCustomReplacer::replace($html);
+$modifiedHtml = ImageUrlReplacer::replace($html);
 ```
 
 ### Example replacements:
