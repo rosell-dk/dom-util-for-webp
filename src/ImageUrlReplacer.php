@@ -26,7 +26,7 @@ namespace DOMUtilForWebP;
 class ImageUrlReplacer
 {
 
-    public static $searchInTags = ['img', 'source', 'input', 'iframe'];
+    public static $searchInTags = ['img', 'source', 'input', 'iframe', 'div', 'li'];    // div and li is added because these are often used with lazy loading
 
     /**
      *
