@@ -63,26 +63,36 @@ class ImageUrlReplacer
         $srcsetArr = explode(',', $attrValue);
         foreach ($srcsetArr as $i => $srcSetEntry) {
             // $srcSetEntry is ie "image.jpg 520w", but can also lack width, ie just "image.jpg"
+            // it can also be ie "image.jpg 2x"
             $srcSetEntry = trim($srcSetEntry);
-            $entryParts = preg_split('/\s+/', $srcSetEntry);
+            $entryParts = preg_split('/\s+/', $srcSetEntry, 2);
             if (count($entryParts) == 2) {
-                list($src, $width) = $entryParts;
+                list($src, $descriptors) = $entryParts;
             } else {
                 $src = $srcSetEntry;
-                $width = null;
+                $descriptors = null;
             }
 
             $webpUrl = $this->replaceUrlOr($src, false);
             if ($webpUrl !== false) {
-                $srcsetArr[$i] = $webpUrl . (isset($width) ? ' ' . $width : '');
+                $srcsetArr[$i] = $webpUrl . (isset($descriptors) ? ' ' . $descriptors : '');
             }
         }
         return implode(', ', $srcsetArr);
     }
 
+    /**
+     *  Test if attribute value looks like it has srcset syntax.
+     *  "image.jpg 100w" does for example. And "image.jpg 1x". Also "image1.jpg, image2.jpg 1x"
+     *  Mixing x and w is invalid (according to https://stackoverflow.com/questions/26928828/html5-srcset-mixing-x-and-w-syntax)
+     *  But we accept it anyway
+     *  It is not the job of this function to see if the first part is an image URL
+     *  That will be done in handleSrcSet.
+     *
+     */
     public function looksLikeSrcSet($value)
     {
-        if (preg_match('#\s\d*w#', $value)) {
+        if (preg_match('#\s\d*(w|x)#', $value)) {
             return true;
         }
         return false;
