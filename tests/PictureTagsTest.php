@@ -66,6 +66,7 @@ class PictureTagsTest extends TestCase
             ['<img SRC="10.jpg">', '<picture><source srcset="10.jpg.webp" type="image/webp"><source srcset="10.jpg"><img src="10.jpg" class="webpexpress-processed"></picture>'],
             ['<IMG SRC="11.jpg">', '<picture><source srcset="11.jpg.webp" type="image/webp"><source srcset="11.jpg"><img src="11.jpg" class="webpexpress-processed"></picture>'],
             ['<figure class="wp-block-image"><img src="12.jpg" alt="" class="wp-image-6" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></figure>', '<figure class="wp-block-image"><picture alt="" class="wp-image-6"><source srcset="12.jpg.webp 492w, 12-300x265.jpg.webp 300w" sizes="(max-width: 492px) 100vw, 492px" type="image/webp"><source srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"><img src="12.jpg" alt="" class="wp-image-6 webpexpress-processed" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></picture></figure>'],
+            ['<img srcset="13a.jpg 1x, 13b.jpg 2x" class="hero">', '<picture class="hero"><source srcset="13a.jpg.webp 1x, 13b.jpg.webp 2x" type="image/webp"><source srcset="13a.jpg 1x, 13b.jpg 2x"><img srcset="13a.jpg 1x, 13b.jpg 2x" class="hero webpexpress-processed"></picture>'],
         ];
 
 
