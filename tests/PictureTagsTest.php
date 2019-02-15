@@ -24,6 +24,7 @@ class PictureTagsCustomReplacer extends PictureTagsTest
     }
 }
 
+// TODO: Test with pixel density descriptor (ie "2x"). https://developer.mozilla.org/en-US/docs/Web/HTML/Element/source
 class PictureTagsTest extends TestCase
 {
 
@@ -55,15 +56,15 @@ class PictureTagsTest extends TestCase
     public function testWholeEngine()
     {
         $tests = [
-            ['<img src="1.png" alt="hello">', '<picture alt="hello"><source src="1.png.webp" type="image/webp"><source src="1.png"><img src="1.png" alt="hello" class="webpexpress-processed"></picture>'],
+            ['<img src="1.png" alt="hello">', '<picture alt="hello"><source srcset="1.png.webp" type="image/webp"><source srcset="1.png"><img src="1.png" alt="hello" class="webpexpress-processed"></picture>'],
             ['<img srcset="2.jpg 1000w" class="hero">', '<picture class="hero"><source srcset="2.jpg.webp 1000w" type="image/webp"><source srcset="2.jpg 1000w"><img srcset="2.jpg 1000w" class="hero webpexpress-processed"></picture>'],
             ['<img srcset="3.jpg 1000w" src="3.jpg">', '<picture><source srcset="3.jpg.webp 1000w" type="image/webp"><source srcset="3.jpg 1000w"><img srcset="3.jpg 1000w" src="3.jpg" class="webpexpress-processed"></picture>'],
             ['<img srcset="3.jpg 1000w, 4.jpg 2000w">', '<picture><source srcset="3.jpg.webp 1000w, 4.jpg.webp 2000w" type="image/webp"><source srcset="3.jpg 1000w, 4.jpg 2000w"><img srcset="3.jpg 1000w, 4.jpg 2000w" class="webpexpress-processed"></picture>'],
             ['<img srcset="5.jpg 1000w, 6.jpg">', '<picture><source srcset="5.jpg.webp 1000w, 6.jpg.webp" type="image/webp"><source srcset="5.jpg 1000w, 6.jpg"><img srcset="5.jpg 1000w, 6.jpg" class="webpexpress-processed"></picture>'],
             ['<img srcset="7.gif 1000w, 8.jpg">', '<picture><source srcset="8.jpg.webp" type="image/webp"><source srcset="7.gif 1000w, 8.jpg"><img srcset="7.gif 1000w, 8.jpg" class="webpexpress-processed"></picture>'],
             ['<img data-lazy-src="9.jpg">', '<picture><source data-lazy-src="9.jpg.webp" type="image/webp"><source data-lazy-src="9.jpg"><img data-lazy-src="9.jpg" class="webpexpress-processed"></picture>'],
-            ['<img SRC="10.jpg">', '<picture><source src="10.jpg.webp" type="image/webp"><source src="10.jpg"><img src="10.jpg" class="webpexpress-processed"></picture>'],
-            ['<IMG SRC="11.jpg">', '<picture><source src="11.jpg.webp" type="image/webp"><source src="11.jpg"><img src="11.jpg" class="webpexpress-processed"></picture>'],
+            ['<img SRC="10.jpg">', '<picture><source srcset="10.jpg.webp" type="image/webp"><source srcset="10.jpg"><img src="10.jpg" class="webpexpress-processed"></picture>'],
+            ['<IMG SRC="11.jpg">', '<picture><source srcset="11.jpg.webp" type="image/webp"><source srcset="11.jpg"><img src="11.jpg" class="webpexpress-processed"></picture>'],
             ['<figure class="wp-block-image"><img src="12.jpg" alt="" class="wp-image-6" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></figure>', '<figure class="wp-block-image"><picture alt="" class="wp-image-6"><source srcset="12.jpg.webp 492w, 12-300x265.jpg.webp 300w" sizes="(max-width: 492px) 100vw, 492px" type="image/webp"><source srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"><img src="12.jpg" alt="" class="wp-image-6 webpexpress-processed" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></picture></figure>'],
         ];
 

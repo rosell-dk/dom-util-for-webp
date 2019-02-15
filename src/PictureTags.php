@@ -159,9 +159,14 @@ class PictureTags
                 return $imgTag;
             }
             $sizesAttr = ($sizesInfo['value'] ? (' ' . $sizesInfo['attrName'] . '="' . $sizesInfo['value'] . '"') : '');
+            $sourceSrcAttrName = $srcsetInfo['attrName'];
+            if ($sourceSrcAttrName == 'src') {
+                // "src" isn't allowed in <source> tag with <picture> tag as parent.
+                $sourceSrcAttrName = 'srcset';
+            }
             return '<picture' . self::createAttributes($pictureAttributes) . '>'
-                . '<source ' . $srcsetInfo['attrName'] . '="' . $srcsetWebP . '"' . $sizesAttr . ' type="image/webp">'
-                . '<source ' . $srcsetInfo['attrName'] . '="' . $srcsetInfo["value"] . '"' . $sizesAttr . '>'
+                . '<source ' . $sourceSrcAttrName . '="' . $srcsetWebP . '"' . $sizesAttr . ' type="image/webp">'
+                . '<source ' . $sourceSrcAttrName . '="' . $srcsetInfo["value"] . '"' . $sizesAttr . '>'
                 . '<img' . self::createAttributes($imgAttributes) . '>'
                 . '</picture>';
         } else {
@@ -171,9 +176,15 @@ class PictureTags
                 return $imgTag;
             }
 
+            $sourceSrcAttrName = $srcInfo['attrName'];
+            if ($sourceSrcAttrName == 'src') {
+                // "src" isn't allowed in <source> tag with <picture> tag as parent.
+                $sourceSrcAttrName = 'srcset';
+            }
+
             return '<picture' . self::createAttributes($pictureAttributes) . '>'
-                . '<source ' . $srcInfo['attrName'] . '="' . $srcWebP . '" type="image/webp">'
-                . '<source ' . $srcInfo['attrName'] . '="' . $srcInfo["value"] . '">'
+                . '<source ' . $sourceSrcAttrName . '="' . $srcWebP . '" type="image/webp">'
+                . '<source ' . $sourceSrcAttrName . '="' . $srcInfo["value"] . '">'
                 . '<img' . self::createAttributes($imgAttributes) . '>'
                 . '</picture>';
         }
