@@ -243,7 +243,10 @@ class ImageUrlReplacerTest extends TestCase
             ['<img data-x="7.gif 1000w, 8.jpg">', '<img data-x="7.gif 1000w, 8.jpg.webp">'],
             ['<img data-lazy-original="9.jpg">', '<img data-lazy-original="9.jpg.webp">'],
             ['<img SRC="10.jpg">', '<img SRC="10.jpg.webp">'],
-            ['<figure class="wp-block-image"><img src="http://we17/subdir/wp-content/uploads/2018/12/tegning5.jpg" alt="" class="wp-image-6" srcset="http://we17/subdir/wp-content/uploads/2018/12/tegning5.jpg 492w, http://we17/subdir/wp-content/uploads/2018/12/tegning5-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></figure>', '<figure class="wp-block-image"><img src="http://we17/subdir/wp-content/uploads/2018/12/tegning5.jpg.webp" alt="" class="wp-image-6" srcset="http://we17/subdir/wp-content/uploads/2018/12/tegning5.jpg.webp 492w, http://we17/subdir/wp-content/uploads/2018/12/tegning5-300x265.jpg.webp 300w" sizes="(max-width: 492px) 100vw, 492px"></figure>']
+            ['<figure class="wp-block-image"><img src="http://we17/subdir/wp-content/uploads/2018/12/tegning5.jpg" alt="" class="wp-image-6" srcset="http://we17/subdir/wp-content/uploads/2018/12/tegning5.jpg 492w, http://we17/subdir/wp-content/uploads/2018/12/tegning5-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></figure>', '<figure class="wp-block-image"><img src="http://we17/subdir/wp-content/uploads/2018/12/tegning5.jpg.webp" alt="" class="wp-image-6" srcset="http://we17/subdir/wp-content/uploads/2018/12/tegning5.jpg.webp 492w, http://we17/subdir/wp-content/uploads/2018/12/tegning5-300x265.jpg.webp 300w" sizes="(max-width: 492px) 100vw, 492px"></figure>'],
+            ['<img srcset="12a.jpg 1x, 12b.jpg 2x">', '<img srcset="12a.jpg.webp 1x, 12b.jpg.webp 2x">'],
+            ['<img srcset="13a.jpg 1x 600w, 13b.jpg 2x 1200w">', '<img srcset="13a.jpg.webp 1x 600w, 13b.jpg.webp 2x 1200w">'],
+            ['<img srcset="14a.jpg, 14b.jpg 10x">', '<img srcset="14a.jpg.webp, 14b.jpg.webp 10x">'],
 
             //TODO: Handle:
             //['<IMG SRC="11.jpg">', '<IMG SRC="11.jpg.webp">'],
