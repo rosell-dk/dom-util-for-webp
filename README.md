@@ -29,8 +29,8 @@ $modifiedHtml = ImageUrlReplacer::replace($html);
 <img src="image.jpg">
 <img src="1.jpg" srcset="2.jpg 1000w">
 <picture>
-    <source src="1.jpg">
-    <source src="2.png">
+    <source srcset="1.jpg" type="image/webp">
+    <source srcset="2.png" type="image/webp">
     <source src="3.gif"> <!-- gifs are skipped in default behaviour -->
     <source src="4.jpg?width=200"> <!-- urls with query string are skipped in default behaviour -->
 </picture>
@@ -50,10 +50,10 @@ $modifiedHtml = ImageUrlReplacer::replace($html);
 <img src="image.jpg.webp">
 <img src="1.jpg.webp" srcset="2.jpg.webp 1000w">
 <picture>
-    <source src="1.jpg.webp">
-    <source src="2.jpg.webp">
-    <source src="3.gif"> <!-- gifs are skipped in default behaviour -->
-    <source src="4.jpg?width=200"> <!-- urls with query string are skipped in default behaviour -->
+    <source srcset="1.jpg.webp" type="image/webp">
+    <source srcset="2.jpg.webp" type="image/webp">
+    <source srcset="3.gif"> <!-- gifs are skipped in default behaviour -->
+    <source srcset="4.jpg?width=200"> <!-- urls with query string are skipped in default behaviour -->
 </picture>
 <div style="background-image: url('image.jpeg.webp')"></div>
 <style>
@@ -140,8 +140,8 @@ $modifiedHtml = PictureTags::replace($html);
 *Output*:
 ```html
 <picture class="webpexpress-processed">
-    <source src="1.png.webp" type="image/webp">
-    <source src="1.png">
+    <source srcset="1.png.webp" type="image/webp">
+    <source srcset="1.png">
     <img src="1.png" class="webpexpress-processed">
 </picture>
 <picture class="webpexpress-processed">
