@@ -122,14 +122,6 @@ class PictureTags
         $srcsetInfo = self::lazyGet($imgAttributes, 'srcset');
         $sizesInfo = self::lazyGet($imgAttributes, 'sizes');
 
-        // We don't wanna have src-ish attributes on the <picture>
-        $pictureAttributes = $imgAttributes;
-        unset($pictureAttributes['src']);
-        unset($pictureAttributes['data-src']);
-        unset($pictureAttributes['data-lazy-src']);
-        unset($pictureAttributes['srcset']);
-        unset($pictureAttributes['sizes']);
-
         // add the exclude class so if this content is processed again in other filter,
         // the img is not converted again in picture
         $imgAttributes['class'] = (isset($imgAttributes['class']) ? $imgAttributes['class'] . " " : "") .
@@ -164,9 +156,8 @@ class PictureTags
                 // "src" isn't allowed in <source> tag with <picture> tag as parent.
                 $sourceSrcAttrName = 'srcset';
             }
-            return '<picture' . self::createAttributes($pictureAttributes) . '>'
+            return '<picture>'
                 . '<source ' . $sourceSrcAttrName . '="' . $srcsetWebP . '"' . $sizesAttr . ' type="image/webp">'
-                . '<source ' . $sourceSrcAttrName . '="' . $srcsetInfo["value"] . '"' . $sizesAttr . '>'
                 . '<img' . self::createAttributes($imgAttributes) . '>'
                 . '</picture>';
         } else {
@@ -182,9 +173,8 @@ class PictureTags
                 $sourceSrcAttrName = 'srcset';
             }
 
-            return '<picture' . self::createAttributes($pictureAttributes) . '>'
+            return '<picture>'
                 . '<source ' . $sourceSrcAttrName . '="' . $srcWebP . '" type="image/webp">'
-                . '<source ' . $sourceSrcAttrName . '="' . $srcInfo["value"] . '">'
                 . '<img' . self::createAttributes($imgAttributes) . '>'
                 . '</picture>';
         }
