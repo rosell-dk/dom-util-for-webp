@@ -155,6 +155,12 @@ class ImageUrlReplacer
 
         //$dom = HtmlDomParser::str_get_html($html, false, false, 'UTF-8', false);
         $dom = str_get_html($html, false, false, 'UTF-8', false);
+        if ($dom === false) {
+            if (strlen($html) > MAX_FILE_SIZE) {
+                return '<!-- Alter HTML was skipped because the HTML is too big to process! (limit is set to ' . MAX_FILE_SIZE . ' bytes) -->' . "\n" . $html;
+            }
+            return '<!-- Alter HTML was skipped because the helper library refused to process the html -->' .  "\n" . $html;
+        }
 
         // Replace attributes (src, srcset, data-src, etc)
         foreach (self::$searchInTags as $tagName) {

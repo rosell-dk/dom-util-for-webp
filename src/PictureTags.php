@@ -73,14 +73,15 @@ class PictureTags
         } else {
             //$dom = HtmlDomParser::str_get_html($html, false, false, 'UTF-8', false);
             $dom = str_get_html($html, false, false, 'UTF-8', false);
-
-            $elems = $dom->find('img,IMG');
-            foreach ($elems as $index => $elem) {
-                $attributes = [];
-                foreach ($elem->getAllAttributes() as $attrName => $attrValue) {
-                    $attributes[strtolower($attrName)] = $attrValue;
-                }
-                return $attributes;
+            if ($dom !== false) {
+                $elems = $dom->find('img,IMG');
+                foreach ($elems as $index => $elem) {
+                    $attributes = [];
+                    foreach ($elem->getAllAttributes() as $attrName => $attrValue) {
+                        $attributes[strtolower($attrName)] = $attrValue;
+                    }
+                    return $attributes;
+                }                
             }
             return [];
         }
