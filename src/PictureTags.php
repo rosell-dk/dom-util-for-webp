@@ -81,7 +81,7 @@ class PictureTags
                         $attributes[strtolower($attrName)] = $attrValue;
                     }
                     return $attributes;
-                }                
+                }
             }
             return [];
         }

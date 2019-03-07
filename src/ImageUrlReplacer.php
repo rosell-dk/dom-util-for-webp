@@ -26,7 +26,8 @@ namespace DOMUtilForWebP;
 class ImageUrlReplacer
 {
 
-    public static $searchInTags = ['img', 'source', 'input', 'iframe', 'div', 'li'];    // div and li is added because these are often used with lazy loading
+    // define tags to be searched. The div and li are on the list because these are often used with lazy loading
+    public static $searchInTags = ['img', 'source', 'input', 'iframe', 'div', 'li'];
 
     /**
      *
@@ -84,7 +85,8 @@ class ImageUrlReplacer
     /**
      *  Test if attribute value looks like it has srcset syntax.
      *  "image.jpg 100w" does for example. And "image.jpg 1x". Also "image1.jpg, image2.jpg 1x"
-     *  Mixing x and w is invalid (according to https://stackoverflow.com/questions/26928828/html5-srcset-mixing-x-and-w-syntax)
+     *  Mixing x and w is invalid (according to
+     *         https://stackoverflow.com/questions/26928828/html5-srcset-mixing-x-and-w-syntax)
      *  But we accept it anyway
      *  It is not the job of this function to see if the first part is an image URL
      *  That will be done in handleSrcSet.
@@ -157,9 +159,11 @@ class ImageUrlReplacer
         $dom = str_get_html($html, false, false, 'UTF-8', false);
         if ($dom === false) {
             if (strlen($html) > MAX_FILE_SIZE) {
-                return '<!-- Alter HTML was skipped because the HTML is too big to process! (limit is set to ' . MAX_FILE_SIZE . ' bytes) -->' . "\n" . $html;
+                return '<!-- Alter HTML was skipped because the HTML is too big to process! ' .
+                    '(limit is set to ' . MAX_FILE_SIZE . ' bytes) -->' . "\n" . $html;
             }
-            return '<!-- Alter HTML was skipped because the helper library refused to process the html -->' .  "\n" . $html;
+            return '<!-- Alter HTML was skipped because the helper library refused to process the html -->' .
+                "\n" . $html;
         }
 
         // Replace attributes (src, srcset, data-src, etc)
