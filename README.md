@@ -148,7 +148,7 @@ $modifiedHtml = PictureTags::replace($html);
 ```
 
 Note that with the picture tags, it is still the img tag that shows the selected image. The picture tag is just a wrapper.
-So it is correct behaviour not to copy the *style*, *width*, *class* or any other attributes to the picture tag. See #9.
+So it is correct behaviour not to copy the *style*, *width*, *class* or any other attributes to the picture tag. See [issue #9](https://github.com/rosell-dk/dom-util-for-webp/issues/9).
 
 
 As with `ImageUrlReplacer`, you can override the *replaceUrl* function. There is however currently no other methods to override.
