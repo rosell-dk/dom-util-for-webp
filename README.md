@@ -131,7 +131,7 @@ $modifiedHtml = PictureTags::replace($html);
 ```html
 <img src="1.png">
 <img srcset="3.jpg 1000w" src="3.jpg">
-<img data-lazy-src="9.jpg">
+<img data-lazy-src="9.jpg" style="border:2px solid red" class="something">
 <figure class="wp-block-image">
     <img src="12.jpg" alt="" class="wp-image-6" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px">
 </figure>
@@ -139,29 +139,17 @@ $modifiedHtml = PictureTags::replace($html);
 
 *Output*:
 ```html
-<picture class="webpexpress-processed">
-    <source srcset="1.png.webp" type="image/webp">
-    <source srcset="1.png">
-    <img src="1.png" class="webpexpress-processed">
-</picture>
-<picture class="webpexpress-processed">
-    <source srcset="3.jpg.webp 1000w" type="image/webp">
-    <source srcset="3.jpg 1000w">
-    <img srcset="3.jpg 1000w" src="3.jpg" class="webpexpress-processed">
-</picture>
-<picture class="webpexpress-processed">
-    <source data-lazy-src="9.jpg.webp" type="image/webp">
-    <source data-lazy-src="9.jpg">
-    <img data-lazy-src="9.jpg" class="webpexpress-processed">
-</picture>
+<picture><source srcset="1.png.webp" type="image/webp"><img src="1.png" class="webpexpress-processed"></picture>
+<picture><source srcset="3.jpg.webp 1000w" type="image/webp"><img srcset="3.jpg 1000w" src="3.jpg" class="webpexpress-processed"></picture>
+<picture><source data-lazy-src="9.jpg.webp" type="image/webp"><img data-lazy-src="9.jpg" style="border:2px solid red" class="something webpexpress-processed"></picture>
 <figure class="wp-block-image">
-    <picture alt="" class="wp-image-6">
-        <source srcset="12.jpg.webp 492w, 12-300x265.jpg.webp 300w" sizes="(max-width: 492px) 100vw, 492px" type="image/webp">
-        <source srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px">
-        <img src="12.jpg" alt="" class="wp-image-6 webpexpress-processed" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px">
-    </picture>
-</figure>
+  <picture><source srcset="12.jpg.webp 492w, 12-300x265.jpg.webp 300w" sizes="(max-width: 492px) 100vw, 492px" type="image/webp"><img src="12.jpg" alt="" class="wp-image-6 webpexpress-processed" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></picture>
+</figure>'
 ```
+
+Note that with the picture tags, it is still the img tag that shows the selected image. The picture tag is just a wrapper.
+So it is correct behaviour not to copy the *style*, *width*, *class* or any other attributes to the picture tag. See #9.
+
 
 As with `ImageUrlReplacer`, you can override the *replaceUrl* function. There is however currently no other methods to override.
 
