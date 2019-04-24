@@ -194,7 +194,7 @@ class PictureTags
     public static function replace($html)
     {
         if (!function_exists('str_get_html')) {
-            require_once 'simple_html_dom/simple_html_dom.inc';
+            require_once __DIR__ . '/../src-vendor/simple_html_dom/simple_html_dom.inc';
         }
         $pt = new static();
         return $pt->replaceHtml($html);

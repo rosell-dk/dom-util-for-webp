@@ -31,7 +31,7 @@ class ImageUrlReplacer
 
     /**
      *
-     * @return webp url or, if URL should not be changed, return nothing
+     * @return string webp url or, if URL should not be changed, return nothing
      **/
     public function replaceUrl($url)
     {
@@ -204,7 +204,7 @@ class ImageUrlReplacer
     public static function replace($html)
     {
         if (!function_exists('str_get_html')) {
-            require_once 'simple_html_dom/simple_html_dom.inc';
+            require_once __DIR__ . '/../src-vendor/simple_html_dom/simple_html_dom.inc';
         }
         $iur = new static();
         return $iur->replaceHtml($html);
