@@ -31,12 +31,12 @@ class ImageUrlReplacer
 
     /**
      *
-     * @return string webp url or, if URL should not be changed, return nothing
+     * @return string|null webp url or, if URL should not be changed, return nothing
      **/
     public function replaceUrl($url)
     {
         if (!preg_match('#(png|jpe?g)$#', $url)) {
-            return;
+            return null;
         }
         return $url . '.webp';
     }
@@ -157,6 +157,11 @@ class ImageUrlReplacer
 
         //$dom = HtmlDomParser::str_get_html($html, false, false, 'UTF-8', false);
         $dom = str_get_html($html, false, false, 'UTF-8', false);
+
+        // MAX_FILE_SIZE is defined in simple_html_dom.
+        // For safety sake, we make sure it is defined before using
+        defined('MAX_FILE_SIZE') || define('MAX_FILE_SIZE', 600000);
+
         if ($dom === false) {
             if (strlen($html) > MAX_FILE_SIZE) {
                 return '<!-- Alter HTML was skipped because the HTML is too big to process! ' .
