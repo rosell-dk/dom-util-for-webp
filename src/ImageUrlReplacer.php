@@ -26,8 +26,21 @@ namespace DOMUtilForWebP;
 class ImageUrlReplacer
 {
 
-    // define tags to be searched. The div and li are on the list because these are often used with lazy loading
-    public static $searchInTags = ['img', 'source', 'input', 'iframe', 'div', 'li'];
+    // define tags to be searched.
+    // The div and li are on the list because these are often used with lazy loading
+    // should we add <meta> ?
+    // Probably not for open graph images or twitter
+    // so not these:
+    // - <meta property="og:image" content="[url]">
+    // - <meta property="og:image:secure_url" content="[url]">
+    // - <meta name="twitter:image" content="[url]">
+    // Meta can also be used in schema.org micro-formatting, ie:
+    // - <meta itemprop="image" content="[url]">
+    //
+    // How about preloaded images? - yes, suppose we should replace those
+    // - <link rel="prefetch" href="[url]">
+    // - <link rel="preload" as="image" href="[url]">
+    public static $searchInTags = ['img', 'source', 'input', 'iframe', 'div', 'li', 'link', 'a', 'section'];
 
     /**
      *
