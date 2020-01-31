@@ -162,7 +162,7 @@ class ImageUrlReplacer
                     $part = preg_replace_callback($regex, 'self::processCSSRegExCallback', $part);
                     //echo 'result:' . $part . "\n";
                 }
-                $declarations[$i] = implode($parts, ',');
+                $declarations[$i] = implode(',', $parts);
             }
         }
         return implode(';', $declarations);
