@@ -19,6 +19,8 @@ matrix:
   include:
     - php: 7.3
       env: PHPSTAN=1
+    - php: 7.4
+      env: PHPSTAN=1
 
 before_script:
   - (composer self-update; true)
