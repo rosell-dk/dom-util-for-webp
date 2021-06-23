@@ -11,7 +11,7 @@
       "@test",
       "@phpcs-all",
       "@composer validate --no-check-all --strict",
-      "@phpstan-global"
+      "@phpstan"
     ],
     "cs-fix-all": [
       "php-cs-fixer fix src"
@@ -22,8 +22,7 @@
     "phpunit": "phpunit --no-coverage",
     "phpcs": "phpcs --standard=PSR2",
     "phpcbf": "phpcbf --standard=PSR2",
-    "phpstan": "vendor/bin/phpstan analyse src --level=4",
-    "phpstan-global": "~/.composer/vendor/bin/phpstan analyse src --level=4"
+    "phpstan": "vendor/bin/phpstan analyse src --level=4"
   },
   "extra": {
       "scripts-descriptions": {
@@ -48,17 +47,13 @@
       "role": "Project Author"
     }
   ],
-  "suggest": {
-    "phpstan/phpstan": "Suggested for dev, in order to analyse code before committing"
-  },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.11",
+    "phpstan/phpstan": "^0.12.90",
     "phpunit/phpunit": "^9.3",
     "squizlabs/php_codesniffer": "3.*"
   },
   "config": {
     "sort-packages": true
-  },
-  "require": {
   }
 }
