@@ -19,6 +19,7 @@
     "cs-fix": "php-cs-fixer fix",
     "cs-dry": "php-cs-fixer fix --dry-run --diff",
     "test": "phpunit  --coverage-text --coverage-clover=coverage.clover",
+    "test-41": "phpunit --coverage-text --configuration 'phpunit-41.xml.dist'",
     "phpunit": "phpunit --no-coverage",
     "phpcs": "phpcs --standard=PSR2",
     "phpcbf": "phpcbf --standard=PSR2",

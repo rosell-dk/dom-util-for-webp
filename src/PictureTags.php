@@ -5,7 +5,21 @@ namespace DOMUtilForWebP;
 //use Sunra\PhpSimple\HtmlDomParser;
 /**
  * Class PictureTags - convert an <img> tag to a <picture> tag and add the webp versions of the images
- * Based this code on code from the ShortPixel plugin, which in turn used code from Responsify WP plugin
+ * Code is based on code from the ShortPixel plugin, which in turn used code from Responsify WP plugin
+ *
+ * It works like this:
+ *
+ * 1. Remove existing <picture> tags and their content - replace with tokens in order to reinsert later
+ * 2. Process <img> tags.
+ *    - The tags are found with regex.
+ *    - The attributes are parsed with DOMDocument if it exists, otherwise with the Simple Html Dom library,
+ *      which is included inside this library
+ * 3. Re-insert the existing <picture> tags
+ *
+ * This procedure is very gentle and needle-like. No need for a complete parse - so invalid HTML is no big issue
+ *
+ * PS:
+ * https://packagist.org/packages/masterminds/html5
  */
 
 use \WebPExpress\AlterHtmlHelper;
