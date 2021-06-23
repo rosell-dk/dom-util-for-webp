@@ -56,7 +56,10 @@ class PictureTagsTest extends TestCase
     public function testWholeEngine()
     {
         $tests = [
-            ['<img src="1.png" alt="hello">', '<picture><source srcset="1.png.webp" type="image/webp"><img src="1.png" alt="hello" class="webpexpress-processed"></picture>'],
+            [
+                '<img src="1.png" alt="hello">',
+                '<picture><source srcset="1.png.webp" type="image/webp"><img src="1.png" alt="hello" class="webpexpress-processed"></picture>'
+            ],
             ['<img srcset="2.jpg 1000w" class="hero">', '<picture><source srcset="2.jpg.webp 1000w" type="image/webp"><img srcset="2.jpg 1000w" class="hero webpexpress-processed"></picture>'],
             ['<img srcset="3.jpg 1000w" src="3.jpg">', '<picture><source srcset="3.jpg.webp 1000w" type="image/webp"><img srcset="3.jpg 1000w" src="3.jpg" class="webpexpress-processed"></picture>'],
             ['<img srcset="3.jpg 1000w, 4.jpg 2000w">', '<picture><source srcset="3.jpg.webp 1000w, 4.jpg.webp 2000w" type="image/webp"><img srcset="3.jpg 1000w, 4.jpg 2000w" class="webpexpress-processed"></picture>'],
@@ -74,6 +77,10 @@ class PictureTagsTest extends TestCase
                 "<img src=\"1.png\">\n<img srcset=\"3.jpg 1000w\" src=\"3.jpg\">\n<img data-lazy-src=\"9.jpg\" style=\"border:2px solid red\" class=\"something\">\n<figure class=\"wp-block-image\">\n  <img src=\"12.jpg\" alt=\"\" class=\"wp-image-6\" srcset=\"12.jpg 492w, 12-300x265.jpg 300w\" sizes=\"(max-width: 492px) 100vw, 492px\">\n</figure>",
                 "<picture><source srcset=\"1.png.webp\" type=\"image/webp\"><img src=\"1.png\" class=\"webpexpress-processed\"></picture>\n<picture><source srcset=\"3.jpg.webp 1000w\" type=\"image/webp\"><img srcset=\"3.jpg 1000w\" src=\"3.jpg\" class=\"webpexpress-processed\"></picture>\n<picture><source data-lazy-src=\"9.jpg.webp\" type=\"image/webp\"><img data-lazy-src=\"9.jpg\" style=\"border:2px solid red\" class=\"something webpexpress-processed\"></picture>\n<figure class=\"wp-block-image\">\n  <picture><source srcset=\"12.jpg.webp 492w, 12-300x265.jpg.webp 300w\" sizes=\"(max-width: 492px) 100vw, 492px\" type=\"image/webp\"><img src=\"12.jpg\" alt=\"\" class=\"wp-image-6 webpexpress-processed\" srcset=\"12.jpg 492w, 12-300x265.jpg 300w\" sizes=\"(max-width: 492px) 100vw, 492px\"></picture>\n</figure>"
             ],
+            [
+              '<picture><img src="1.png"</picture><img src="2.png">', // the img inside picture should not be altered
+              '<picture><img src="1.png"</picture><picture><source srcset="2.png.webp" type="image/webp"><img src="2.png" class="webpexpress-processed"></picture>'
+            ]
         ];
 
 
@@ -85,7 +92,7 @@ class PictureTagsTest extends TestCase
             'src="header.jpeg"',                // whats that, not in tag!
             '<script src="http://example.com/script.js?preload=image.jpg">',        // wrong tag
             '<img><script src="http://example.com/script.js?preload=image.jpg">',   // wrong tag
-            //'<div><picture><source srcset="1.png.webp" type="image/webp"><img src="1.png" alt="hello"></picture></div>' // inside picture
+            '<div><picture><source srcset="1.png.webp" type="image/webp"><img src="1.png" alt="hello"></picture></div>hello<picture><img src="2.png"></picture>' // inside picture
         ];
 
         foreach ($theseShouldBeLeftUntouchedTests as $skipThis) {

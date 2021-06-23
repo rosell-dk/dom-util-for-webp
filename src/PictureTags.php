@@ -22,7 +22,10 @@ class PictureTags
      */
     public final function __construct()
     {
+      $this->existingPictureTags = [];
     }
+
+    private $existingPictureTags;
 
     public function replaceUrl($url)
     {
@@ -118,7 +121,7 @@ class PictureTags
     }
 
     /**
-     *  Replace <image> tag with <picture> tag.
+     *  Replace <img> tag with <picture> tag.
      */
     private function replaceCallback($match)
     {
@@ -195,10 +198,40 @@ class PictureTags
     /*
      *
      */
+    public function removePictureTagsTemporarily($content)
+    {
+        //print_r($content);
+        $this->existingPictureTags[] = $content[0];
+        return 'PICTURE_TAG_' . (count($this->existingPictureTags) - 1) . '_';
+    }
+
+    /*
+     *
+     */
+    public function insertPictureTagsBack($content)
+    {
+        $numberString = $content[1];
+        $numberInt = intval($numberString);
+        return $this->existingPictureTags[$numberInt];
+    }
+
+    /**
+     *
+     */
     public function replaceHtml($content)
     {
-        // TODO: We should not replace <img> tags that are inside <picture> tags already, now should we?
-        return preg_replace_callback('/<img[^>]*>/i', array($this, 'replaceCallback'), $content);
+        $this->existingPictureTags = [];
+
+        // Tempororily remove existing <picture> tags
+        $content = preg_replace_callback('/<picture[^>]*>.*?<\/picture>/i', array($this, 'removePictureTagsTemporarily'), $content);
+
+        // Replace "<img>" tags
+        $content = preg_replace_callback('/<img[^>]*>/i', array($this, 'replaceCallback'), $content);
+
+        // Re-insert <picture> tags that was removed
+        $content = preg_replace_callback('/PICTURE_TAG_(\d+)_/', array($this, 'insertPictureTagsBack'), $content);
+
+        return $content;
     }
 
     /* Main replacer function */
