@@ -1,12 +1,5 @@
 <?php
 
-/**
- * WebPConvert - Convert JPEG & PNG to WebP with PHP
- *
- * @link https://github.com/rosell-dk/webp-convert
- * @license MIT
- */
-
 namespace DOMUtilForWebPTests;
 
 use PHPUnit\Framework\TestCase;

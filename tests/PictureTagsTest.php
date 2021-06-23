@@ -10,10 +10,9 @@
 namespace DOMUtilForWebPTests;
 
 use PHPUnit\Framework\TestCase;
-use Sunra\PhpSimple\HtmlDomParser;
 use DOMUtilForWebP\PictureTags;
 
-
+/*
 class PictureTagsCustomReplacer extends PictureTagsTest
 {
     public function replaceUrl($url) {
@@ -25,6 +24,7 @@ class PictureTagsCustomReplacer extends PictureTagsTest
 }
 
 // TODO: Test with pixel density descriptor (ie "2x"). https://developer.mozilla.org/en-US/docs/Web/HTML/Element/source
+*/
 class PictureTagsTest extends TestCase
 {
 
@@ -65,7 +65,10 @@ class PictureTagsTest extends TestCase
             ['<img data-lazy-src="9.jpg">', '<picture><source data-lazy-src="9.jpg.webp" type="image/webp"><img data-lazy-src="9.jpg" class="webpexpress-processed"></picture>'],
             ['<img SRC="10.jpg">', '<picture><source srcset="10.jpg.webp" type="image/webp"><img src="10.jpg" class="webpexpress-processed"></picture>'],
             ['<IMG SRC="11.jpg">', '<picture><source srcset="11.jpg.webp" type="image/webp"><img src="11.jpg" class="webpexpress-processed"></picture>'],
-            ['<figure class="wp-block-image"><img src="12.jpg" alt="" class="wp-image-6" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></figure>', '<figure class="wp-block-image"><picture><source srcset="12.jpg.webp 492w, 12-300x265.jpg.webp 300w" sizes="(max-width: 492px) 100vw, 492px" type="image/webp"><img src="12.jpg" alt="" class="wp-image-6 webpexpress-processed" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></picture></figure>'],
+            [
+              '<figure class="wp-block-image"><img src="12.jpg" alt="" class="wp-image-6" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></figure>',
+              '<figure class="wp-block-image"><picture><source srcset="12.jpg.webp 492w, 12-300x265.jpg.webp 300w" sizes="(max-width: 492px) 100vw, 492px" type="image/webp"><img src="12.jpg" alt="" class="wp-image-6 webpexpress-processed" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></picture></figure>'
+            ],
             ['<img srcset="13a.jpg 1x, 13b.jpg 2x" class="hero">', '<picture><source srcset="13a.jpg.webp 1x, 13b.jpg.webp 2x" type="image/webp"><img srcset="13a.jpg 1x, 13b.jpg 2x" class="hero webpexpress-processed"></picture>'],
             [
                 "<img src=\"1.png\">\n<img srcset=\"3.jpg 1000w\" src=\"3.jpg\">\n<img data-lazy-src=\"9.jpg\" style=\"border:2px solid red\" class=\"something\">\n<figure class=\"wp-block-image\">\n  <img src=\"12.jpg\" alt=\"\" class=\"wp-image-6\" srcset=\"12.jpg 492w, 12-300x265.jpg 300w\" sizes=\"(max-width: 492px) 100vw, 492px\">\n</figure>",
@@ -82,6 +85,7 @@ class PictureTagsTest extends TestCase
             'src="header.jpeg"',                // whats that, not in tag!
             '<script src="http://example.com/script.js?preload=image.jpg">',        // wrong tag
             '<img><script src="http://example.com/script.js?preload=image.jpg">',   // wrong tag
+            //'<div><picture><source srcset="1.png.webp" type="image/webp"><img src="1.png" alt="hello"></picture></div>' // inside picture
         ];
 
         foreach ($theseShouldBeLeftUntouchedTests as $skipThis) {
