@@ -246,6 +246,10 @@ class ImageUrlReplacerTest extends TestCase
             "<noscript><img src=\"https://y4f6w8c3.stackpathcdn.com/wp-content/plugins/revslider/admin/assets/images/dummy.png.webp\"  alt=\"\" title=\"christmas-banner-slideshow\"  width=\"1400\" height=\"539\" data-lazyload=\"https://y4f6w8c3.stackpathcdn.com/wp-content/uploads/2018/10/christmas-banner-slideshow.jpg.webp\" data-bgposition=\"center top\" data-bgfit=\"cover\" data-bgrepeat=\"no-repeat\" data-bgparallax=\"off\" class=\"rev-slidebg\" data-no-retina></noscript><div class=\"tp-caption tp-shape tp-shapewrapper  tp-resizeme\" \n id=\"slide-3-layer-7\" \n data-x=\"['center','center','center','center']\" data-hoffset=\"['-1','-1','-1','-1']\" \n data-y=\"['middle','middle','middle','middle']\" data-voffset=\"['0','0','0','0']\" \n            data-width=\"2200\"\ndata-height=\"full\"\ndata-whitespace=\"nowrap\"\n\ndata-type=\"shape\" \ndata-responsive_offset=\"on\" \n\ndata-frames='[{\"delay\":500,\"speed\":300,\"frame\":\"0\",\"from\":\"opacity:0;\",\"to\":\"o:1;\",\"ease\":\"Power3.easeInOut\"},{\"delay\":\"wait\",\"speed\":300,\"frame\":\"999\",\"to\":\"opacity:0;\",\"ease\":\"Power3.easeInOut\"}]'\ndata-textAlign=\"['inherit','inherit','inherit','inherit']\"\ndata-paddingtop=\"[0,0,0,0]\"\ndata-paddingright=\"[0,0,0,0]\"\ndata-paddingbottom=\"[0,0,0,0]\"\ndata-paddingleft=\"[0,0,0,0]\"\n\nstyle=\"z-index: 5;background-color:rgba(0,0,0,0.5);\"> </div>"],
             ['<img src="http://www.example.com/11.jpg">', '<img src="http://www.example.com/11.jpg.webp">'],
             ['<img src="https://www.example.com/12.jpg">', '<img src="https://www.example.com/12.jpg.webp">'],
+            [
+              '<header id="masthead" class="site-header" role="banner" style="background-image: url(https://cdn.example.com/wp-content/uploads/2020/01/banner.jpg); ">',
+              '<header id="masthead" class="site-header" role="banner" style="background-image: url(https://cdn.example.com/wp-content/uploads/2020/01/banner.jpg.webp); ">',
+            ]
             //TODO: Handle:
             //['<IMG SRC="11.jpg">', '<IMG SRC="11.jpg.webp">'],
         ];
