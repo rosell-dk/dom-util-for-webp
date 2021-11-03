@@ -100,6 +100,10 @@ class PictureTags
             return $attributes;
         } else {
             //$dom = HtmlDomParser::str_get_html($html, false, false, 'UTF-8', false);
+            if (!function_exists('str_get_html')) {
+                require_once __DIR__ . '/../src-vendor/simple_html_dom/simple_html_dom.inc';
+            }
+
             $dom = str_get_html($html, false, false, 'UTF-8', false);
             if ($dom !== false) {
                 $elems = $dom->find('img,IMG');
@@ -251,9 +255,6 @@ class PictureTags
     /* Main replacer function */
     public static function replace($html)
     {
-        if (!function_exists('str_get_html')) {
-            require_once __DIR__ . '/../src-vendor/simple_html_dom/simple_html_dom.inc';
-        }
         $pt = new static();
         return $pt->replaceHtml($html);
     }
