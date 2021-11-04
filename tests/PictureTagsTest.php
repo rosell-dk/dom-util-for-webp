@@ -57,30 +57,85 @@ class PictureTagsTest extends TestCase
     {
         $tests = [
             [
+                // most basic (src)
                 '<img src="1.png" alt="hello">',
                 '<picture><source srcset="1.png.webp" type="image/webp"><img src="1.png" alt="hello" class="webpexpress-processed"></picture>'
             ],
-            ['<img srcset="2.jpg 1000w" class="hero">', '<picture><source srcset="2.jpg.webp 1000w" type="image/webp"><img srcset="2.jpg 1000w" class="hero webpexpress-processed"></picture>'],
-            ['<img srcset="3.jpg 1000w" src="3.jpg">', '<picture><source srcset="3.jpg.webp 1000w" type="image/webp"><img srcset="3.jpg 1000w" src="3.jpg" class="webpexpress-processed"></picture>'],
-            ['<img srcset="3.jpg 1000w, 4.jpg 2000w">', '<picture><source srcset="3.jpg.webp 1000w, 4.jpg.webp 2000w" type="image/webp"><img srcset="3.jpg 1000w, 4.jpg 2000w" class="webpexpress-processed"></picture>'],
-            ['<img srcset="5.jpg 1000w, 6.jpg">', '<picture><source srcset="5.jpg.webp 1000w, 6.jpg.webp" type="image/webp"><img srcset="5.jpg 1000w, 6.jpg" class="webpexpress-processed"></picture>'],
-            ['<img srcset="7.gif 1000w, 8.jpg">', '<picture><source srcset="8.jpg.webp" type="image/webp"><img srcset="7.gif 1000w, 8.jpg" class="webpexpress-processed"></picture>'],
-            ['<img data-lazy-src="9.jpg">', '<picture><source data-lazy-src="9.jpg.webp" type="image/webp"><img data-lazy-src="9.jpg" class="webpexpress-processed"></picture>'],
-            ['<img SRC="10.jpg">', '<picture><source srcset="10.jpg.webp" type="image/webp"><img src="10.jpg" class="webpexpress-processed"></picture>'],
-            ['<IMG SRC="11.jpg">', '<picture><source srcset="11.jpg.webp" type="image/webp"><img src="11.jpg" class="webpexpress-processed"></picture>'],
             [
-              '<figure class="wp-block-image"><img src="12.jpg" alt="" class="wp-image-6" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></figure>',
-              '<figure class="wp-block-image"><picture><source srcset="12.jpg.webp 492w, 12-300x265.jpg.webp 300w" sizes="(max-width: 492px) 100vw, 492px" type="image/webp"><img src="12.jpg" alt="" class="wp-image-6 webpexpress-processed" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></picture></figure>'
+                // both src and srcset - also very common
+                '<img srcset="src-and-srcset.jpg 1000w" src="3.jpg">',
+                '<picture><source srcset="src-and-srcset.jpg.webp 1000w" type="image/webp"><img srcset="src-and-srcset.jpg 1000w" src="3.jpg" class="webpexpress-processed"></picture>'
+            ],
+            [
+                // sizes attribute must be copied to source element and kept on img element
+                '<img srcset="sizes.jpg 1000w" src="3.jpg" sizes="(max-width: 492px) 100vw, 492px">',
+                '<picture><source srcset="sizes.jpg.webp 1000w" sizes="(max-width: 492px) 100vw, 492px" type="image/webp"><img srcset="sizes.jpg 1000w" src="3.jpg" sizes="(max-width: 492px) 100vw, 492px" class="webpexpress-processed"></picture>'
+            ],
+            /*[
+                // TODO: when both sizes and data-sizes are set, copy both to source element
+                '<img srcset="sizes.jpg 1000w" src="3.jpg" sizes="(max-width: 50px) 50vw, 150px" data-sizes="(max-width: 492px) 100vw, 492px">',
+                '<picture><source srcset="sizes.jpg.webp 1000w" sizes="(max-width: 50px) 50vw, 150px" data-sizes="(max-width: 492px) 100vw, 492px" type="image/webp"><img srcset="sizes.jpg 1000w" src="3.jpg" sizes="(max-width: 50px) 50vw, 150px" data-sizes="(max-width: 492px) 100vw, 492px" class="webpexpress-processed"></picture>'
+            ],*/
+            [
+                // when both srcset and data-srcset are set, keep both (was fixed in #26)
+                '<img srcset="1.jpg 480w, 2.jpg 800w" data-lazy-srcset="1.jpg 480w, 2.jpg 800w">',
+                '<picture><source srcset="1.jpg.webp 480w, 2.jpg.webp 800w" data-lazy-srcset="1.jpg.webp 480w, 2.jpg.webp 800w" type="image/webp"><img srcset="1.jpg 480w, 2.jpg 800w" data-lazy-srcset="1.jpg 480w, 2.jpg 800w" class="webpexpress-processed"></picture>'
+            ],
+            [
+                // data urls should be left untouched. (svg+xml has given error, but one could perhaps imagine problem with a data
+                // url that accidentially ends with jpg, such as (such as <img src="data:image/gif;base64,R0lGOD.jpg">...")
+                '<img src="data:image/svg+xml,...">',
+                '<img src="data:image/svg+xml,...">'
+            ],
+            [
+                // existing classes on the img must be kept
+                '<img srcset="2.jpg 1000w" class="hero">',
+                '<picture><source srcset="2.jpg.webp 1000w" type="image/webp"><img srcset="2.jpg 1000w" class="hero webpexpress-processed"></picture>'
+            ],
+            [
+                // multiple sizes in srcset
+                '<img srcset="3.jpg 1000w, 4.jpg 2000w">',
+                '<picture><source srcset="3.jpg.webp 1000w, 4.jpg.webp 2000w" type="image/webp"><img srcset="3.jpg 1000w, 4.jpg 2000w" class="webpexpress-processed"></picture>'
+            ],
+            [
+                // multiple images in srcset, one of them missing width. Missing width should be kept
+                '<img srcset="5.jpg 1000w, 6.jpg">',
+                '<picture><source srcset="5.jpg.webp 1000w, 6.jpg.webp" type="image/webp"><img srcset="5.jpg 1000w, 6.jpg" class="webpexpress-processed"></picture>'
+            ],
+            [
+                // we have invalid html, as src is required. Best not to mess with invalid html, so no replacement!
+                '<img data-lazy-src="no-src-attr-in-img.jpg">',
+                '<img data-lazy-src="no-src-attr-in-img.jpg">',
+                //'<picture><source data-lazy-src="9.jpg.webp" type="image/webp"><img data-lazy-src="9.jpg" class="webpexpress-processed"></picture>'
+            ],
+            [
+                // also invalid html, ignored!
+                '<img data-lazy-srcset="1.jpg 480w, 2.jpg 800w">',
+                '<img data-lazy-srcset="1.jpg 480w, 2.jpg 800w">'
+            ],
+            [
+                // minor: upperase attribute SRC will become lowercase...
+                '<img SRC="uppercase1.jpg">',
+                '<picture><source srcset="uppercase1.jpg.webp" type="image/webp"><img src="uppercase1.jpg" class="webpexpress-processed"></picture>'
+            ],
+            [
+                // minor: uppercase tag name also becomes lowercase
+                '<IMG SRC="uppercase2.jpg">',
+                '<picture><source srcset="uppercase2.jpg.webp" type="image/webp"><img src="uppercase2.jpg" class="webpexpress-processed"></picture>'
+            ],
+            [
+                // real-world example (wordpress)
+                '<figure class="wp-block-image"><img src="12.jpg" alt="" class="wp-image-6" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></figure>',
+                '<figure class="wp-block-image"><picture><source srcset="12.jpg.webp 492w, 12-300x265.jpg.webp 300w" sizes="(max-width: 492px) 100vw, 492px" type="image/webp"><img src="12.jpg" alt="" class="wp-image-6 webpexpress-processed" srcset="12.jpg 492w, 12-300x265.jpg 300w" sizes="(max-width: 492px) 100vw, 492px"></picture></figure>'
             ],
             ['<img srcset="13a.jpg 1x, 13b.jpg 2x" class="hero">', '<picture><source srcset="13a.jpg.webp 1x, 13b.jpg.webp 2x" type="image/webp"><img srcset="13a.jpg 1x, 13b.jpg 2x" class="hero webpexpress-processed"></picture>'],
             [
-                "<img src=\"1.png\">\n<img srcset=\"3.jpg 1000w\" src=\"3.jpg\">\n<img data-lazy-src=\"9.jpg\" style=\"border:2px solid red\" class=\"something\">\n<figure class=\"wp-block-image\">\n  <img src=\"12.jpg\" alt=\"\" class=\"wp-image-6\" srcset=\"12.jpg 492w, 12-300x265.jpg 300w\" sizes=\"(max-width: 492px) 100vw, 492px\">\n</figure>",
-                "<picture><source srcset=\"1.png.webp\" type=\"image/webp\"><img src=\"1.png\" class=\"webpexpress-processed\"></picture>\n<picture><source srcset=\"3.jpg.webp 1000w\" type=\"image/webp\"><img srcset=\"3.jpg 1000w\" src=\"3.jpg\" class=\"webpexpress-processed\"></picture>\n<picture><source data-lazy-src=\"9.jpg.webp\" type=\"image/webp\"><img data-lazy-src=\"9.jpg\" style=\"border:2px solid red\" class=\"something webpexpress-processed\"></picture>\n<figure class=\"wp-block-image\">\n  <picture><source srcset=\"12.jpg.webp 492w, 12-300x265.jpg.webp 300w\" sizes=\"(max-width: 492px) 100vw, 492px\" type=\"image/webp\"><img src=\"12.jpg\" alt=\"\" class=\"wp-image-6 webpexpress-processed\" srcset=\"12.jpg 492w, 12-300x265.jpg 300w\" sizes=\"(max-width: 492px) 100vw, 492px\"></picture>\n</figure>"
+                // the img inside picture should not be become yet another picture tag.
+                // right now, anything in picture tags are left untouched.
+                // however, we should add source(s). See #25
+                '<picture><img src="img-in-existing-picture.png"></picture>',
+                '<picture><img src="img-in-existing-picture.png"></picture>'
             ],
-            [
-              '<picture><img src="1.png"</picture><img src="2.png">', // the img inside picture should not be altered
-              '<picture><img src="1.png"</picture><picture><source srcset="2.png.webp" type="image/webp"><img src="2.png" class="webpexpress-processed"></picture>'
-            ]
         ];
 
 
