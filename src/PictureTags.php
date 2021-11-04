@@ -213,8 +213,10 @@ class PictureTags
 
                 $webpUrl = $this->replaceUrlOr($src, false);
                 if ($webpUrl !== false) {
-                    $atLeastOneWebp = true;
-                    $srcsetArrWebP[] = $webpUrl . (isset($width) ? ' ' . $width : '');
+                    if (substr($src, 0, 5) != 'data:') {
+                        $atLeastOneWebp = true;
+                        $srcsetArrWebP[] = $webpUrl . (isset($width) ? ' ' . $width : '');
+                    }
                 }
             }
             $sourceTagAttributes[$attrName] = implode(', ', $srcsetArrWebP);

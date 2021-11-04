@@ -53,23 +53,55 @@ class PictureTagsTest extends TestCase
         }
     }
 
-    public function testWholeEngine()
+    public static function runPictureTagsTest($me, $html, $expectedOutput)
     {
+        $output = PictureTags::replace($html);
+        $me->assertEquals($expectedOutput, $output);
+    }
+
+    public function testBasic()
+    {
+        // most basic (src)
+        self::runPictureTagsTest($this,
+            '<img src="1.png" alt="hello">',
+            '<picture>' .
+                '<source srcset="1.png.webp" type="image/webp">' .
+                '<img src="1.png" alt="hello" class="webpexpress-processed">' .
+            '</picture>'
+        );
+    }
+
+    public function testSrcAndSrcSet()
+    {
+        // both src and srcset - also very common
+        self::runPictureTagsTest($this,
+            '<img srcset="src-and-srcset.jpg 1000w" src="3.jpg">',
+            '<picture>' .
+                '<source srcset="src-and-srcset.jpg.webp 1000w" type="image/webp">' .
+                '<img srcset="src-and-srcset.jpg 1000w" src="3.jpg" class="webpexpress-processed">' .
+            '</picture>'
+        );
+    }
+
+    public function testTheRest()
+    {
+        // TODO: Create individual methods for these tests, like above - eases finding out which that fails
         $tests = [
-            [
-                // most basic (src)
-                '<img src="1.png" alt="hello">',
-                '<picture><source srcset="1.png.webp" type="image/webp"><img src="1.png" alt="hello" class="webpexpress-processed"></picture>'
-            ],
-            [
-                // both src and srcset - also very common
-                '<img srcset="src-and-srcset.jpg 1000w" src="3.jpg">',
-                '<picture><source srcset="src-and-srcset.jpg.webp 1000w" type="image/webp"><img srcset="src-and-srcset.jpg 1000w" src="3.jpg" class="webpexpress-processed"></picture>'
-            ],
             [
                 // sizes attribute must be copied to source element and kept on img element
                 '<img srcset="sizes.jpg 1000w" src="3.jpg" sizes="(max-width: 492px) 100vw, 492px">',
-                '<picture><source srcset="sizes.jpg.webp 1000w" sizes="(max-width: 492px) 100vw, 492px" type="image/webp"><img srcset="sizes.jpg 1000w" src="3.jpg" sizes="(max-width: 492px) 100vw, 492px" class="webpexpress-processed"></picture>'
+                '<picture>' .
+                    '<source srcset="sizes.jpg.webp 1000w" sizes="(max-width: 492px) 100vw, 492px" type="image/webp">' .
+                    '<img srcset="sizes.jpg 1000w" src="3.jpg" sizes="(max-width: 492px) 100vw, 492px" class="webpexpress-processed">' .
+                '</picture>'
+            ],
+            [
+                // srcset contains images that are not available as webp. These are removed from srcset on the source element
+                '<img srcset="1.jpg 1000w, 2.gif 999w" src="3.jpg">',
+                '<picture>' .
+                    '<source srcset="1.jpg.webp 1000w" type="image/webp">' .
+                    '<img srcset="1.jpg 1000w, 2.gif 999w" src="3.jpg" class="webpexpress-processed">' .
+                '</picture>'
             ],
             /*[
                 // TODO: when both sizes and data-sizes are set, copy both to source element
@@ -82,10 +114,17 @@ class PictureTagsTest extends TestCase
                 '<picture><source srcset="1.jpg.webp 480w, 2.jpg.webp 800w" data-lazy-srcset="1.jpg.webp 480w, 2.jpg.webp 800w" type="image/webp"><img srcset="1.jpg 480w, 2.jpg 800w" data-lazy-srcset="1.jpg 480w, 2.jpg 800w" class="webpexpress-processed"></picture>'
             ],
             [
-                // data urls should be left untouched. (svg+xml has given error, but one could perhaps imagine problem with a data
-                // url that accidentially ends with jpg, such as (such as <img src="data:image/gif;base64,R0lGOD.jpg">...")
-                '<img src="data:image/svg+xml,...">',
-                '<img src="data:image/svg+xml,...">'
+                // skip an image if its "src" attribute has a data url (svg+xml has given error)
+                '<img src="data:image/svg+xml,...jpg">',
+                '<img src="data:image/svg+xml,...jpg">'
+            ],
+            [
+                // remove "data:" urls from srcset in source
+                '<img srcset="1.jpg 100w, data:image/gif;base64,R0lGOD.jpg 777w" src="3.jpg">',
+                '<picture>' .
+                    '<source srcset="1.jpg.webp 100w" type="image/webp">' .
+                    '<img srcset="1.jpg 100w, data:image/gif;base64,R0lGOD.jpg 777w" src="3.jpg" class="webpexpress-processed">' .
+                '</picture>'
             ],
             [
                 // existing classes on the img must be kept
