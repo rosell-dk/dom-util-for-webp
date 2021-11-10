@@ -3,7 +3,6 @@
 namespace DOMUtilForWebPTests;
 
 use PHPUnit\Framework\TestCase;
-use Sunra\PhpSimple\HtmlDomParser;
 use DOMUtilForWebP\ImageUrlReplacer;
 
 class ImageUrlReplacerPassThrough extends ImageUrlReplacer

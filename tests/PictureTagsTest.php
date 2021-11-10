@@ -175,6 +175,13 @@ class PictureTagsTest extends TestCase
                 '<picture><img src="img-in-existing-picture.png"></picture>',
                 '<picture><img src="img-in-existing-picture.png"></picture>'
             ],
+            [
+                '<img loading="lazy" width="1055" height="700" src="https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80.jpg" alt="" title="Patricia-80" srcset="https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80.jpg 1055w, https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80-980x650.jpg 980w, https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80-480x318.jpg 480w" sizes="(min-width: 0px) and (max-width: 480px) 480px, (min-width: 481px) and (max-width: 980px) 980px, (min-width: 981px) 1055px, 100vw" class="wp-image-191978" />',
+                '<picture>' .
+                  '<source srcset="https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80.jpg.webp 1055w, https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80-980x650.jpg.webp 980w, https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80-480x318.jpg.webp 480w" sizes="(min-width: 0px) and (max-width: 480px) 480px, (min-width: 481px) and (max-width: 980px) 980px, (min-width: 981px) 1055px, 100vw" type="image/webp">' .
+                  '<img loading="lazy" width="1055" height="700" src="https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80.jpg" alt="" title="Patricia-80" srcset="https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80.jpg 1055w, https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80-980x650.jpg 980w, https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80-480x318.jpg 480w" sizes="(min-width: 0px) and (max-width: 480px) 480px, (min-width: 481px) and (max-width: 980px) 980px, (min-width: 981px) 1055px, 100vw" class="wp-image-191978 webpexpress-processed">' .
+                  '</picture>'
+            ]
         ];
 
 
