@@ -114,16 +114,13 @@ class PictureTags
 
     private static function getAttributes($html)
     {
-        if (function_exists("mb_convert_encoding")) {
-            $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        }
         if (class_exists('\\DOMDocument')) {
             $dom = new \DOMDocument();
             @$dom->loadHTML($html);
             $image = $dom->getElementsByTagName('img')->item(0);
             $attributes = [];
             foreach ($image->attributes as $attr) {
-                    $attributes[$attr->nodeName] = $attr->nodeValue;
+                $attributes[$attr->nodeName] = $attr->nodeValue;
             }
             return $attributes;
         } else {
@@ -132,8 +129,11 @@ class PictureTags
                 require_once __DIR__ . '/../src-vendor/simple_html_dom/simple_html_dom.inc';
             }*/
 
+            // Took detection from here:
+            // https://github.com/symfony/symfony/blob/d31ea7c230160b3930f4789ed38c959c5db4f723/src/Symfony/Component/DomCrawler/Crawler.php
+            $charset = preg_match('//u', $html) ? 'UTF-8' : 'ISO-8859-1';
 
-            $dom = HtmlDomParser::str_get_html($html, false, false, 'UTF-8', false);
+            $dom = HtmlDomParser::str_get_html($html, false, false, $charset, false);
             if ($dom !== false) {
                 $elems = $dom->find('img,IMG');
                 foreach ($elems as $index => $elem) {
