@@ -160,7 +160,7 @@ class ImageUrlReplacer
                 foreach ($parts as &$part) {
                     //echo 'part:' . $part . "\n";
                     $regex = '#(url\\s*\\(([\\"\\\']?))([^\\\'\\";\\)]*)(\\2\\s*\\))#';
-                    $part = preg_replace_callback($regex, 'self::processCSSRegExCallback', $part);
+                    $part = preg_replace_callback($regex, '\DOMUtilForWebP\ImageUrlReplacer::processCSSRegExCallback', $part);
                     //echo 'result:' . $part . "\n";
                 }
                 $declarations[$i] = implode(',', $parts);
