@@ -312,7 +312,7 @@ class PictureTags
         $this->existingPictureTags = [];
 
         // Tempororily remove existing <picture> tags
-        $content = preg_replace_callback('/<picture[^>]*>.*?<\/picture>/i', array($this, 'removePictureTagsTemporarily'), $content);
+        $content = preg_replace_callback('/<picture[^>]*>.*?<\/picture>/is', array($this, 'removePictureTagsTemporarily'), $content);
 
         // Replace "<img>" tags
         $content = preg_replace_callback('/<img[^>]*>/i', array($this, 'replaceCallback'), $content);
