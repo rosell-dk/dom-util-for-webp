@@ -20,6 +20,7 @@
     "cs-dry": "php-cs-fixer fix --dry-run --diff",
     "test": "phpunit --coverage-text=build/coverage.txt --coverage-clover=build/coverage.clover --coverage-html=build/coverage --whitelist=src tests",
     "test-41": "phpunit --coverage-text --configuration 'phpunit-41.xml.dist'",
+    "test-no-cov": "phpunit --no-coverage tests",
     "phpunit": "phpunit --no-coverage",
     "phpcs": "phpcs --standard=phpcs-ruleset.xml",
     "phpcs-all": "phpcs --standard=phpcs-ruleset.xml src",
