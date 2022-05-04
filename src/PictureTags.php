@@ -35,9 +35,9 @@ class PictureTags
      * would be unsafe. See #21
      * @return  void
      */
-    public final function __construct()
+    final public function __construct()
     {
-      $this->existingPictureTags = [];
+        $this->existingPictureTags = [];
     }
 
     private $existingPictureTags;
@@ -210,7 +210,6 @@ class PictureTags
                 $width = null;
                 if ($result && count($result) >= 2) {
                     list($src, $width) = $result;
-
                 }
 
                 $webpUrl = $this->replaceUrlOr($src, false);
@@ -225,7 +224,6 @@ class PictureTags
         }
 
         foreach ($srcAttributes as $attrName => $attrValue) {
-
             if (substr($attrValue, 0, 5) == 'data:') {
                 // ignore tags with data urls, such as <img src="data:...
                 return $imgTag;
@@ -312,7 +310,11 @@ class PictureTags
         $this->existingPictureTags = [];
 
         // Tempororily remove existing <picture> tags
-        $content = preg_replace_callback('/<picture[^>]*>.*?<\/picture>/is', array($this, 'removePictureTagsTemporarily'), $content);
+        $content = preg_replace_callback(
+            '/<picture[^>]*>.*?<\/picture>/is',
+            array($this, 'removePictureTagsTemporarily'),
+            $content
+        );
 
         // Replace "<img>" tags
         $content = preg_replace_callback('/<img[^>]*>/i', array($this, 'replaceCallback'), $content);
