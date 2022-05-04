@@ -21,8 +21,9 @@
     "test": "phpunit --coverage-text=build/coverage.txt --coverage-clover=build/coverage.clover --coverage-html=build/coverage --whitelist=src tests",
     "test-41": "phpunit --coverage-text --configuration 'phpunit-41.xml.dist'",
     "phpunit": "phpunit --no-coverage",
-    "phpcs": "phpcs --standard=PSR2",
-    "phpcbf": "phpcbf --standard=PSR2",
+    "phpcs": "phpcs --standard=phpcs-ruleset.xml",
+    "phpcs-all": "phpcs --standard=phpcs-ruleset.xml src",
+    "phpcbf": "phpcbf --standard=phpcs-ruleset.xml",
     "phpstan": "vendor/bin/phpstan analyse src --level=4"
   },
   "extra": {
