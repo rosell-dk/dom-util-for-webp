@@ -157,12 +157,12 @@ class PictureTagsTest extends TestCase
     public function testUTFSpecialEntitiesInAttribute()
     {
         $html = file_get_contents(__DIR__ . '/encodings/utf-8.html');
-        $this->assertEquals('<img srcset="src-and-srcset.jpg 1000w" src="3.jpg" alt="д">' . "\n", $html);
+        $this->assertEquals('<img srcset="src-and-srcset.jpg 1000w" src="3.jpg" alt="д">' . PHP_EOL, $html);
 
         $expectedOutput = '<picture>' .
             '<source srcset="src-and-srcset.jpg.webp 1000w" type="image/webp">' .
             '<img srcset="src-and-srcset.jpg 1000w" src="3.jpg" alt="&#1076;" class="webpexpress-processed">' .
-            '</picture>' . "\n";
+            '</picture>' . PHP_EOL;
 
 
         resetPretending();

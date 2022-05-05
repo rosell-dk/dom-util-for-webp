@@ -16,8 +16,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-20.04]
-        php: [8.0] 
+        os: [windows-2022]
+        php: [8.1]
 
     steps:
     - name: Checkout
