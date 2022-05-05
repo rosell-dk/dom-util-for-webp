@@ -317,6 +317,8 @@ class PictureTags
     public function replaceHtml($content)
     {
         if (function_exists('mb_detect_encoding')) {
+            // PS: Correctly identifying Windows-1251 encoding only works on some systems
+            //     But at least I'm not aware of any false positives
             if (mb_detect_encoding($content, ["ASCII", "UTF8", "Windows-1251"]) == 'Windows-1251') {
                 $content = mb_convert_encoding($content, 'UTF-8', 'Windows-1251');
             }
