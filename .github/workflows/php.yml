@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [windows-2022]
+        os: [ubuntu-latest]
         php: [8.1]
 
     steps:
