@@ -112,6 +112,22 @@ class PictureTags
         return $result;
     }
 
+    /**
+     *  Convert to UTF-8 and encode chars outside of ascii-range
+     *
+     *  Input: html that might be in any character encoding and might contain non-ascii characters
+     *  Output: html in UTF-8 encding, where non-ascii characters are encoded
+     *
+     */
+    private static function textToUTF8WithNonAsciiEncoded($html)
+    {
+        if (function_exists("mb_convert_encoding")) {
+            $html = mb_convert_encoding($html, 'UTF-8');
+            $html = mb_encode_numericentity($html, array (0x7f, 0xffff, 0, 0xffff), 'UTF-8');
+        }
+        return $html;
+    }
+
     private static function getAttributes($html)
     {
         if (class_exists('\\DOMDocument')) {
@@ -124,16 +140,8 @@ class PictureTags
             }
             return $attributes;
         } else {
-            //$dom = HtmlDomParser::str_get_html($html, false, false, 'UTF-8', false);
-            /*if (!function_exists('str_get_html')) {
-                require_once __DIR__ . '/../src-vendor/simple_html_dom/simple_html_dom.inc';
-            }*/
-
-            // Took detection from here:
-            // https://github.com/symfony/symfony/blob/d31ea7c230160b3930f4789ed38c959c5db4f723/src/Symfony/Component/DomCrawler/Crawler.php
-            $charset = preg_match('//u', $html) ? 'UTF-8' : 'ISO-8859-1';
-
-            $dom = HtmlDomParser::str_get_html($html, false, false, $charset, false);
+            $html =  self::textToUTF8WithNonAsciiEncoded($html);
+            $dom = HtmlDomParser::str_get_html($html, false, false, 'UTF-8', false);
             if ($dom !== false) {
                 $elems = $dom->find('img,IMG');
                 foreach ($elems as $index => $elem) {
