@@ -181,11 +181,22 @@ class PictureTagsTest extends TestCase
 
     }
 
+    public function testCP1251CanBeDetected()
+    {
+        if (function_exists('mb_detect_encoding')) {
+            $in = file_get_contents(__DIR__ . '/encodings/cp1251-input.html');
+
+            $this->assertEquals(
+                'Windows-1251',
+                mb_detect_encoding($in, ["ASCII", "UTF8", "Windows-1251"])
+            );
+        }
+    }
+
     public function testCP1251()
     {
         resetPretending();
         pretendClassNotExisting('\\DOMDocument');
-
 
         $in = file_get_contents(__DIR__ . '/encodings/cp1251-input.html');
         $expectedOutput = file_get_contents(__DIR__ . '/encodings/cp1251-output.html');
@@ -194,8 +205,8 @@ class PictureTagsTest extends TestCase
         $output = PictureTags::replace($in);
         //$output = 'aoeu';
         $this->assertEquals($expectedOutput, print_r($output, true), 'cyrilic');
-
     }
+
 
     public function testTheRest()
     {
