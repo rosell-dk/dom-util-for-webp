@@ -83,6 +83,120 @@ class PictureTagsTest extends TestCase
         );
     }
 
+    public function testHtmlToUTF8()
+    {
+        $method = new \ReflectionMethod("\DOMUtilForWebP\PictureTags", "textToUTF8WithNonAsciiEncoded");
+        $method->setAccessible(true);
+
+        $tests = [
+            [
+                // encode chars outside ascii range
+                'дЭ',
+                '&#1076;&#1069;'
+            ],
+            [   // don't mess up HTML codes
+                '<>&"\'',
+                '<>&"\''
+            ],
+            [   // don't mess up HTML codes
+                'å',
+                '&#229;'
+            ],
+            [
+                '<div>hello"</div>',
+                '<div>hello"</div>'
+            ],
+            [
+                '<img src="3.jpg" alt="Э">',
+                '<img src="3.jpg" alt="&#1069;">'
+            ],
+
+
+        ];
+
+        foreach ($tests as $test) {
+            $in = $test[0];
+            $expectedOut = $test[1];
+
+            $this->assertEquals(
+                $expectedOut,
+                $method->invoke(null, $in)
+            );
+
+            // Check that our new method has same result as our old
+            $out = mb_convert_encoding($in, 'HTML-ENTITIES', 'UTF-8');
+
+            // allow variants
+            $out = str_replace('&aring;', '&#229;', $out);
+
+            $this->assertEquals(
+                $expectedOut,
+                $out
+            );
+        }
+
+        resetPretending();
+        /*
+        pretendFunctionNotExisting('mb_convert_encoding');
+
+        foreach ($tests as $test) {
+            $in = $test[0];
+            $expectedOut = $test[1];
+
+            $this->assertEquals(
+                $expectedOut,
+                $method->invoke(null, $in)
+            );
+        }*/
+
+
+
+    }
+
+
+    public function testUTFSpecialEntitiesInAttribute()
+    {
+        $html = file_get_contents(__DIR__ . '/encodings/utf-8.html');
+        $this->assertEquals('<img srcset="src-and-srcset.jpg 1000w" src="3.jpg" alt="д">' . "\n", $html);
+
+        $expectedOutput = '<picture>' .
+            '<source srcset="src-and-srcset.jpg.webp 1000w" type="image/webp">' .
+            '<img srcset="src-and-srcset.jpg 1000w" src="3.jpg" alt="&#1076;" class="webpexpress-processed">' .
+            '</picture>' . "\n";
+
+
+        resetPretending();
+        pretendClassNotExisting('\\DOMDocument');
+        self::runPictureTagsTest($this, $html, $expectedOutput);
+
+        //resetPretending();
+        //self::runPictureTagsTest($this, $html, $expectedOutput);
+
+/*
+        resetPretending();
+        pretendClassNotExisting('\\DOMDocument');
+        pretendFunctionNotExisting('mb_convert_encoding');
+        self::runPictureTagsTest($this, $html, $expectedOutput);
+        */
+
+    }
+
+    public function testCP1251()
+    {
+        resetPretending();
+        pretendClassNotExisting('\\DOMDocument');
+
+
+        $in = file_get_contents(__DIR__ . '/encodings/cp1251-input.html');
+        $expectedOutput = file_get_contents(__DIR__ . '/encodings/cp1251-output.html');
+        //$this->assertEquals('<img srcset="src-and-srcset.jpg 1000w" src="3.jpg" alt="Это текст для тестирования">' . "\n", $in);
+
+        $output = PictureTags::replace($in);
+        //$output = 'aoeu';
+        $this->assertEquals($expectedOutput, print_r($output, true), 'cyrilic');
+
+    }
+
     public function testTheRest()
     {
         // TODO: Create individual methods for these tests, like above - eases finding out which that fails
@@ -204,13 +318,30 @@ class PictureTagsTest extends TestCase
                 '<img src="https://staging.greenboxdesigns.com/botswana-experience/wp-content/uploads/2021/12/botswana-safari-tour-operator-hero-4.jpg" sizes="100vw" alt="Botswana safari holidays safari vehicle elephant"></picture>'
         ];
 
-        foreach ($theseShouldBeLeftUntouchedTests as $skipThis) {
-            $tests[] = [$skipThis, $skipThis];
+        foreach ([true, false] as $domClassAvailable) {
+            foreach ([true, false] as $mbAvailable) {
+
+                resetPretending();
+                if (!$domClassAvailable) {
+                    pretendClassNotExisting('\\DOMDocument');
+                }
+                if (!$mbAvailable) {
+                    pretendFunctionNotExisting('mb_convert_encoding');
+                }
+
+                foreach ($theseShouldBeLeftUntouchedTests as $skipThis) {
+                    $tests[] = [$skipThis, $skipThis];
+                }
+
+                foreach ($tests as list($html, $expectedOutput)) {
+                    $output = PictureTags::replace($html);
+                    $this->assertEquals($expectedOutput, $output);
+                }
+            }
         }
 
-        foreach ($tests as list($html, $expectedOutput)) {
-            $output = PictureTags::replace($html);
-            $this->assertEquals($expectedOutput, $output);
-        }
+
     }
 }
+
+require_once('pretender.inc');

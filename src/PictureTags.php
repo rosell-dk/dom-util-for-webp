@@ -316,6 +316,12 @@ class PictureTags
      */
     public function replaceHtml($content)
     {
+        if (function_exists('mb_detect_encoding')) {
+            if (mb_detect_encoding($content, ["ASCII", "UTF8", "Windows-1251"]) == 'Windows-1251') {
+                $content = mb_convert_encoding($content, 'UTF-8', 'Windows-1251');
+            }
+        }
+
         $this->existingPictureTags = [];
 
         // Tempororily remove existing <picture> tags
