@@ -134,7 +134,7 @@ class PictureTags
             $dom = new \DOMDocument();
 
             if (function_exists("mb_encode_numericentity")) {
-                // I'm in doubt if I should add the following line:
+                // I'm in doubt if I should add the following line (see #41)
                 // $html = mb_convert_encoding($html, 'UTF-8');
                 $html = mb_encode_numericentity($html, array (0x7f, 0xffff, 0, 0xffff));  // #41
             }
