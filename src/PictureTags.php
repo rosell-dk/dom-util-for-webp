@@ -266,35 +266,6 @@ class PictureTags
             . '<source' . self::createAttributes($sourceTagAttributes) . ' type="image/webp">'
             . '<img' . self::createAttributes($imgAttributes) . '>'
             . '</picture>';
-
-/*
-        //if ($srcsetInfo['value']) {
-        if (isset($srcSetAttributes['srcset'])) {
-            $sourceTagAttributes = $srcSetAttributes;
-
-
-            return '<picture>'
-                . '<source' . self::createAttributes($sourceTagAttributes) . ' type="image/webp">'
-                . '<img' . self::createAttributes($imgAttributes) . '>'
-                . '</picture>';
-        } else {
-            $srcWebP = $this->replaceUrlOr($srcInfo['value'], false);
-            if ($srcWebP === false) {
-                // No reason to create <picture> tag
-                return $imgTag;
-            }
-
-            $sourceSrcAttrName = $srcInfo['attrName'];
-            if ($sourceSrcAttrName == 'src') {
-                // "src" isn't allowed in <source> tag with <picture> tag as parent.
-                $sourceSrcAttrName = 'srcset';
-            }
-
-            return '<picture>'
-                . '<source ' . $sourceSrcAttrName . '="' . $srcWebP . '" type="image/webp">'
-                . '<img' . self::createAttributes($imgAttributes) . '>'
-                . '</picture>';
-        }*/
     }
 
     /*
