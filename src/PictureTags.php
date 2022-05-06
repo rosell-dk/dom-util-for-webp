@@ -132,8 +132,9 @@ class PictureTags
     {
         if (class_exists('\\DOMDocument')) {
             $dom = new \DOMDocument();
-            // The next line is commented out, because I had second thoughts. See #39
-            // $html = self::textToUTF8WithNonAsciiEncoded($html);
+
+            $html = mb_encode_numericentity($html, array (0x7f, 0xffff, 0, 0xffff));  // #41
+
             @$dom->loadHTML($html);
             $image = $dom->getElementsByTagName('img')->item(0);
             $attributes = [];
