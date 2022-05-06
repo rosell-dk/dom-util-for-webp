@@ -132,7 +132,8 @@ class PictureTags
     {
         if (class_exists('\\DOMDocument')) {
             $dom = new \DOMDocument();
-            $html = self::textToUTF8WithNonAsciiEncoded($html);
+            // The next line is commented out, because I had second thoughts. See #39
+            // $html = self::textToUTF8WithNonAsciiEncoded($html);
             @$dom->loadHTML($html);
             $image = $dom->getElementsByTagName('img')->item(0);
             $attributes = [];
@@ -141,6 +142,11 @@ class PictureTags
             }
             return $attributes;
         } else {
+            // Convert to UTF-8 because HtmlDomParser::str_get_html needs to be told the
+            // encoding. As UTF-8 might conflict with the charset set in the meta, we must
+            // encode all characters outside the ascii-range.
+            // It would perhaps have been better to try to guess the encoding rather than
+            // changing it (see #39), but I'm reluctant to introduce changes.
             $html =  self::textToUTF8WithNonAsciiEncoded($html);
             $dom = HtmlDomParser::str_get_html($html, false, false, 'UTF-8', false);
             if ($dom !== false) {
@@ -316,7 +322,7 @@ class PictureTags
      */
     public function replaceHtml($content)
     {
-        if (function_exists('mb_detect_encoding')) {
+        if (!class_exists('\\DOMDocument') && function_exists('mb_detect_encoding')) {
             // PS: Correctly identifying Windows-1251 encoding only works on some systems
             //     But at least I'm not aware of any false positives
             if (mb_detect_encoding($content, ["ASCII", "UTF8", "Windows-1251"]) == 'Windows-1251') {

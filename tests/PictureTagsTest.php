@@ -206,21 +206,30 @@ class PictureTagsTest extends TestCase
             );
         }
     }
+    */
 
     public function testCP1251()
     {
         resetPretending();
         pretendClassNotExisting('\\DOMDocument');
 
-        $in = file_get_contents(__DIR__ . '/encodings/cp1251-input.html');
-        $expectedOutput = file_get_contents(__DIR__ . '/encodings/cp1251-output.html');
-        //$this->assertEquals('<img srcset="src-and-srcset.jpg 1000w" src="3.jpg" alt="Это текст для тестирования">' . "\n", $in);
+        if (function_exists('mb_detect_encoding')) {
+            $in = file_get_contents(__DIR__ . '/encodings/cp1251-input.html');
 
-        $output = PictureTags::replace($in);
-        //$output = 'aoeu';
-        $this->assertEquals($expectedOutput, print_r($output, true), 'cyrilic');
+            // unfortunately, mb_detect_encoding cannot always guess this correctly,
+            // So handling CP1251 when DOMDocument is missing only works some of the time
+            if (mb_detect_encoding($in, ["ASCII", "UTF8", "Windows-1251"]) == 'Windows-1251') {
+
+                $expectedOutput = file_get_contents(__DIR__ . '/encodings/cp1251-output.html');
+                //$this->assertEquals('<img srcset="src-and-srcset.jpg 1000w" src="3.jpg" alt="Это текст для тестирования">' . "\n", $in);
+
+                $output = PictureTags::replace($in);
+                //$output = 'aoeu';
+                $this->assertEquals($expectedOutput, print_r($output, true), 'cyrilic');
+
+            }
+        }
     }
-    */
 
 
     public function testTheRest()
