@@ -12,6 +12,16 @@ namespace DOMUtilForWebPTests;
 use PHPUnit\Framework\TestCase;
 use DOMUtilForWebP\PictureTags;
 
+class PictureTagsOnlyJpg extends PictureTags
+{
+    public function replaceUrl($url) {
+        // Only accept urls ending with "jpg"!
+        if (!preg_match('#jpe?g$#', $url)) {
+            return;
+        }
+        return $url . '.webp';
+    }
+}
 /*
 class PictureTagsCustomReplacer extends PictureTagsTest
 {
@@ -124,7 +134,8 @@ class PictureTagsTest extends TestCase
             );
 
             // Check that our new method has same result as our old
-            $out = mb_convert_encoding($in, 'HTML-ENTITIES', 'UTF-8');
+            // PS: mb_convert_encoding is deprecated - we suppress the warning with @
+            $out = @mb_convert_encoding($in, 'HTML-ENTITIES', 'UTF-8');
 
             // allow variants
             $out = str_replace('&aring;', '&#229;', $out);
@@ -231,6 +242,42 @@ class PictureTagsTest extends TestCase
         }
     }
 
+    public function testWithMissingWebPSrc()
+    {
+        /*
+        Testing that the whole operation is skipped if one of the webps are missing (#42)
+        First testing with one missing (png is not allowed in "PictureTagsOnlyJpg")
+        */
+        $input = '<img src="1.png" alt="hello">';
+        $expectedOutput = $input;
+        $output = PictureTagsOnlyJpg::replace($input);
+        $this->assertEquals($expectedOutput, $output);
+    }
+
+    public function testWithMissingWebPSrcSet()
+    {
+        /*
+        Testing that the whole operation is skipped if a single of the webps are missing (#42)
+        (We use our custom class, PictureTagsOnlyJpg, which allows jpg, but not png)
+        */
+        $input = '<img src="1.jpg" srcset="1.jpg 600w, 2.png 40w, 3.jpg 60w" sizes="(max-width: 600px) 100vw, 600px">';
+        $expectedOutput = $input;
+        $output = PictureTagsOnlyJpg::replace($input);
+        $this->assertEquals($expectedOutput, $output);
+
+        /*
+        PS: Old behaviour was to only remove the missing from source set.
+        As we saw in #42, this was a bad strategy
+        [
+            // srcset contains images that are not available as webp. These are removed from srcset on the source element
+            '<img srcset="1.jpg 1000w, 2.gif 999w" src="3.jpg">',
+            '<picture>' .
+                '<source srcset="1.jpg.webp 1000w" type="image/webp">' .
+                '<img srcset="1.jpg 1000w, 2.gif 999w" src="3.jpg" class="webpexpress-processed">' .
+            '</picture>'
+        ],
+        */
+    }
 
     public function testTheRest()
     {
@@ -242,14 +289,6 @@ class PictureTagsTest extends TestCase
                 '<picture>' .
                     '<source srcset="sizes.jpg.webp 1000w" sizes="(max-width: 492px) 100vw, 492px" type="image/webp">' .
                     '<img srcset="sizes.jpg 1000w" src="3.jpg" sizes="(max-width: 492px) 100vw, 492px" class="webpexpress-processed">' .
-                '</picture>'
-            ],
-            [
-                // srcset contains images that are not available as webp. These are removed from srcset on the source element
-                '<img srcset="1.jpg 1000w, 2.gif 999w" src="3.jpg">',
-                '<picture>' .
-                    '<source srcset="1.jpg.webp 1000w" type="image/webp">' .
-                    '<img srcset="1.jpg 1000w, 2.gif 999w" src="3.jpg" class="webpexpress-processed">' .
                 '</picture>'
             ],
             /*[
@@ -330,7 +369,22 @@ class PictureTagsTest extends TestCase
                   '<source srcset="https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80.jpg.webp 1055w, https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80-980x650.jpg.webp 980w, https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80-480x318.jpg.webp 480w" sizes="(min-width: 0px) and (max-width: 480px) 480px, (min-width: 481px) and (max-width: 980px) 980px, (min-width: 981px) 1055px, 100vw" type="image/webp">' .
                   '<img loading="lazy" width="1055" height="700" src="https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80.jpg" alt="" title="Patricia-80" srcset="https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80.jpg 1055w, https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80-980x650.jpg 980w, https://techpoint.africa/wp-content/uploads/2021/08/Patricia-80-480x318.jpg 480w" sizes="(min-width: 0px) and (max-width: 480px) 480px, (min-width: 481px) and (max-width: 980px) 980px, (min-width: 981px) 1055px, 100vw" class="wp-image-191978 webpexpress-processed">' .
                   '</picture>'
-            ]
+            ],
+            // #42, hm it works
+            [
+              '<img width="462" height="600" src="test.jpg" class="attachment-shop_single size-shop_single" alt="Category Management planogram" srcset="test.jpg 462w, test-231x300.jpg 231w, test-150x195.jpg 150w, test-308x400.jpg 308w, test-200x260.jpg 200w" sizes="(max-width: 462px) 100vw, 462px">',
+              '<picture><source srcset="test.jpg.webp 462w, test-231x300.jpg.webp 231w, test-150x195.jpg.webp 150w, test-308x400.jpg.webp 308w, test-200x260.jpg.webp 200w" sizes="(max-width: 462px) 100vw, 462px" type="image/webp"><img width="462" height="600" src="test.jpg" class="attachment-shop_single size-shop_single webpexpress-processed" alt="Category Management planogram" srcset="test.jpg 462w, test-231x300.jpg 231w, test-150x195.jpg 150w, test-308x400.jpg 308w, test-200x260.jpg 200w" sizes="(max-width: 462px) 100vw, 462px"></picture>'
+            ],
+            // #42, the long urls, is that the problem? - no
+            [
+              '<img width="462" height="600" src="https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826-.jpg" class="attachment-shop_single size-shop_single" alt="Category Management planogram" srcset="https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826-.jpg 462w, https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826--231x300.jpg 231w, https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826--150x195.jpg 150w, https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826--308x400.jpg 308w, https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826--200x260.jpg 200w" sizes="(max-width: 462px) 100vw, 462px">',
+              '<picture><source srcset="https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826-.jpg.webp 462w, https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826--231x300.jpg.webp 231w, https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826--150x195.jpg.webp 150w, https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826--308x400.jpg.webp 308w, https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826--200x260.jpg.webp 200w" sizes="(max-width: 462px) 100vw, 462px" type="image/webp"><img width="462" height="600" src="https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826-.jpg" class="attachment-shop_single size-shop_single webpexpress-processed" alt="Category Management planogram" srcset="https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826-.jpg 462w, https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826--231x300.jpg 231w, https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826--150x195.jpg 150w, https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826--308x400.jpg 308w, https://www.makingbusinessmatter.co.uk/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2019/12/Planogram-Updated-2-Revised-scaled-e1575965112826--200x260.jpg 200w" sizes="(max-width: 462px) 100vw, 462px"></picture>'
+            ],
+            /*[
+              '<img width="462" height="600" src="data:image/svg+xml,%3Csvg%20xmlns=\'http://www.w3.org/2000/svg\'%20viewBox=\'0%200%20462%20600\'%3E%3C/svg%3E" class="attachment-shop_single size-shop_single webpexpress-processed" alt="Category Management planogram" data-lazy-srcset="test.jpg 462w, test-231x300.jpg 231w, test-150x195.jpg 150w, test-308x400.jpg 308w, test-200x260.jpg 200w" data-lazy-sizes="(max-width: 462px) 100vw, 462px" data-lazy-src="test.jpg">',
+              ''
+            ]*/
+
         ];
 
 
