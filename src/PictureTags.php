@@ -236,9 +236,8 @@ class PictureTags
                 if ($webpUrl == false) {
                   // We want ALL of the sizes as webp.
                   // If we cannot have that, it is better to abort! - See #42
-                  return $imgTag;
-                }
-                else {
+                    return $imgTag;
+                } else {
                     if (substr($src, 0, 5) != 'data:') {
                         $atLeastOneWebp = true;
                         $srcsetArrWebP[] = $webpUrl . (isset($width) ? ' ' . $width : '');
