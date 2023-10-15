@@ -21,7 +21,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: ${{ matrix.php }}
+        php-version: 8.2
         coverage: xdebug  # PS: Use "xdebug2" for PHP 7.2-7.4, otherwise "xdebug"
         extensions: mbstring
 
@@ -39,7 +39,6 @@ jobs:
         key: php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           php-${{ hashFiles('**/composer.lock') }}
-          php-${{ matrix.php }}
           php-
 
     - name: Composer install
