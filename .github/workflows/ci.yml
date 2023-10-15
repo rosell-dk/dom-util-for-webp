@@ -1,6 +1,10 @@
-name: Giant test
+name: CI
 
-on: workflow_dispatch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 permissions:
   contents: read
@@ -10,14 +14,10 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        os: [ubuntu-22.04, ubuntu-20.04, windows-2022, windows-2019, macos-13, macos-12, macos-11]
-        php: [8.4, 8.3, 8.2, 8.1, 8.0, 7.4, 7.3, 7.2, 7.1, 7.0, 5.6]
-        #os: [windows-2022, macos-11]
-        #os: [windows-2022]
-        #os: [macos-11]
-        #php: [7.1]
+        os: [windows-2022]
+        php: [8.2]
 
     steps:
     - name: Checkout
@@ -66,7 +66,7 @@ jobs:
         echo "Downgrading phpunit to ^5.0, which is the highest version that supports PHP 5.6"
         composer require "phpunit/phpunit:^5.0" --dev --no-update
 
-    # Create composer.lock, which is going to be used in the cache key
+    # Create composer.lock, which is going to be used in the cache key, and for install
     - name: Create composer.lock for cache key (this is a library, so composer.lock is not part of repo)
       run: composer update --no-install
 
@@ -85,7 +85,7 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Run phpunit (test cases)
-      run: composer run-script test-no-cov
+      run: composer run-script test
 
     - name: Run phpstan on PHP>=7.2 (to check php syntax)
       if: (matrix.php != '5.6') && (matrix.php != '7.0') && (matrix.php != '7.1') && (matrix.php != '7.2')
