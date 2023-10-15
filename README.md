@@ -168,7 +168,7 @@ Each new release will be tested on all combinations of OSs and PHP versions that
 
 Testing consists of running the unit tests. The code in this library is almost completely covered by tests (~95% coverage).
 
-Release 0.7.0 has been tested in PHP: 5.6 - 8.2 on the following OSs: Ubuntu (22.04, 20.04, 18.04), Windows (2022, 2019), Mac OS (13, 12, 11, 10.15). Code coverage: ~97%
+Release 0.7.0 has been tested in PHP: 5.6 - 8.2 on the following OSs: Ubuntu (22.04, 20.04, 18.04), Windows (2022, 2019), Mac OS (13, 12, 11, 10.15). Code coverage: ~95%
 
 ## Do you like what I do?
 Perhaps you want to support my work, so I can continue doing it :)
