@@ -159,6 +159,17 @@ As with `ImageUrlReplacer`, you can override the *replaceUrl* function. There is
 
 `PictureTags` currently uses regular expressions to do the replacing. There are plans to change implementation to use `Sunra\PhpSimple\HtmlDomParser`, like our `ImageUrlReplacer` class does.
 
+## Platforms
+Works on (at least):
+OS: Ubuntu (22.04, 20.04), Windows (2022, 2019), Mac OS (11, 10.15)
+PHP: 5.6 - 8.2 (also tested 8.3 and 8.4 development versions in October 2023)
+
+Each new release will be tested on all combinations of OSs and PHP versions that are [supported](https://github.com/marketplace/actions/setup-php-action) by GitHub-hosted runners. Except that we do not below PHP 5.6.
+
+Testing consists of running the unit tests. The code in this library is almost completely covered by tests (~95% coverage).
+
+Release 0.7.0 has been tested in PHP: 5.6 - 8.2 on the following OSs: Ubuntu (22.04, 20.04, 18.04), Windows (2022, 2019), Mac OS (13, 12, 11, 10.15). Code coverage: ~97%
+
 ## Do you like what I do?
 Perhaps you want to support my work, so I can continue doing it :)
 
