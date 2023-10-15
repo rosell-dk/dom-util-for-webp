@@ -23,21 +23,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Determine which version of xdebug to use
-      run: |
-        # Set XDEBUG to "xdebug2" for PHP 7.2-7.4, but to "xdebug" for
-        if grep -oP '^7.[234]' <<< "$PHP" > /dev/null; then XDEBUG=xdebug2; else XDEBUG=xdebug; fi
-
-        # Store XDEBUG in github env, so we can access it later through env.XDEBUG
-        echo "XDEBUG=$XDEBUG" >> $GITHUB_ENV
-
-        echo "Result: ${{ env.XDEBUG }}"
-
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php }}
-        coverage: ${{ env.XDEBUG }}
+        coverage: xdebug  # PS: Use "xdebug2" for PHP 7.2-7.4, otherwise "xdebug"
         extensions: mbstring
 
     - name: Validate composer.json
