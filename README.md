@@ -168,6 +168,12 @@ Each new release will be tested on all combinations of OSs and PHP versions that
 
 Testing consists of running the unit tests. The code in this library is almost completely covered by tests (~95% coverage).
 
+We also test future versions of PHP monthly, in order to catch problems early.
+Status:
+[![PHP 8.3](https://img.shields.io/github/actions/workflow/status/rosell-dk/dom-util-for-webp/php83.yml?branch=master&logo=GitHub&style=flat-square&label=PHP%208.3)](https://github.com/rosell-dk/dom-util-for-webp/actions/workflows/php83.yml)
+[![PHP 8.4](https://img.shields.io/github/actions/workflow/status/rosell-dk/dom-util-for-webp/php84.yml?branch=master&logo=GitHub&style=flat-square&label=PHP%208.4)](https://github.com/rosell-dk/dom-util-for-webp/actions/workflows/php84.yml)
+
+
 ## Do you like what I do?
 Perhaps you want to support my work, so I can continue doing it :)
 
