@@ -153,7 +153,7 @@ class PictureTags
             // It would perhaps have been better to try to guess the encoding rather than
             // changing it (see #39), but I'm reluctant to introduce changes.
             $html =  self::textToUTF8WithNonAsciiEncoded($html);
-            $dom = HtmlDomParser::str_get_html($html, false, false, 'UTF-8', false);
+            $dom = HtmlDomParser::str_get_html($html, false, true, 'UTF-8', false);
             if ($dom !== false) {
                 $elems = $dom->find('img,IMG');
                 foreach ($elems as $index => $elem) {
