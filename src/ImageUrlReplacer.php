@@ -104,7 +104,7 @@ class ImageUrlReplacer
                 $srcsetArr[$i] = $webpUrl . (isset($descriptors) ? ' ' . $descriptors : '');
             }
         }
-        return implode(', ', $srcsetArr);
+        return implode(',', $srcsetArr);
     }
 
     /**
