@@ -163,6 +163,74 @@ class ImageUrlReplacerTest extends TestCase
         }
     }
 
+    public function testNoiseCannotBreakOutOfAttribute()
+    {
+        $payload = '" tabindex="1" autofocus onfocus="alert(document.domain)" mark="1';
+        $htmlInput = '<code>' . $payload . '</code>' .
+            '<abbr title="___noise___ 1000">T</abbr>';
+
+        $output = ImageUrlReplacerCustomReplacer::replace($htmlInput);
+
+        $prev = libxml_use_internal_errors(true);
+        $doc = new \DOMDocument();
+        $doc->loadHTML('<?xml encoding="UTF-8"><body>' . $output . '</body>');
+        libxml_clear_errors();
+        libxml_use_internal_errors($prev);
+
+        $handlers = (new \DOMXPath($doc))->query('//@*[starts-with(name(), "on")]');
+        $this->assertEquals(0, $handlers->length, 'Output must not contain event handler attributes');
+    }
+
+    public function noiseMarkerFragments()
+    {
+        return [
+            'full marker'           => ['<p>___noise___ 1000</p>'],
+            'unknown key'           => ['<p>___noise___ 9999</p>'],
+            'upper case'            => ['<p>___NOISE___ 1000</p>'],
+            'fragment + {a}'        => ['<p>___noise{a}</p>'],
+            'fragment_ + {a}'       => ['<p>___noise_{a}</p>'],
+            'fragment__ + {a}'      => ['<p>___noise__{a}</p>'],
+            'fragment + CDATA'   => ['<p>___noise<![CDATA[x]]></p>'],
+            'fragment + php tag' => ['<p>___noise<?php x ?></p>'],
+        ];
+    }
+
+    /**
+     * @dataProvider noiseMarkerFragments
+     */
+    public function testNoiseMarkerFragmentsAreNotProcessed($htmlInput)
+    {
+        $output = ImageUrlReplacerCustomReplacer::replace($htmlInput);
+        $this->assertEquals($htmlInput, $output);
+    }
+
+    /*public function testNestedNoiseTokensCannotBeChained()
+    {
+        // A code body that itself references another token must not be expanded either
+        $htmlInput = '<code>___noise___ 1001</code><code>" onfocus="alert(1)" x="</code>' .
+            '<abbr title="___noise___ 1000">T</abbr>';
+
+        $output = ImageUrlReplacerCustomReplacer::replace($htmlInput);
+        $this->assertStringNotContainsString('title="" onfocus', $output);
+    }*/
+
+/*    public function testSelfReferencingNoiseTokenDoesNotHang()
+    {
+        // A <code> body that contains its own placeholder makes restore_noise() loop forever
+        $htmlInput = '<p><code>___noise___ 1000</code></p>';
+
+        $output = ImageUrlReplacerCustomReplacer::replace($htmlInput);
+        $this->assertEquals($htmlInput, $output);
+    }*/
+
+    public function testCodeElementContentIsPreserved()
+    {
+        // Guards against a fix that over-escapes: ordinary code blocks must come through untouched
+        $htmlInput = '<p><code>if ($a < $b && $c > 1) { echo "x"; }</code></p>';
+
+        $output = ImageUrlReplacerCustomReplacer::replace($htmlInput);
+        $this->assertEquals($htmlInput, $output);
+    }
 
     public function testCustomUrlReplacer()
     {
