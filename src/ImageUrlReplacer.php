@@ -191,7 +191,7 @@ class ImageUrlReplacer
         // - a marker that cannot be resolved makes restore_noise() loop forever (denial of service)
         //
         // Real pages never contain "___noise", so leave such HTML untouched rather than risk it.
-        // This check mitigates the vulnerability discovered by Jakub Herman        
+        // This check mitigates the vulnerability discovered by Jakub Herman
         if (stripos($html, '___noise') !== false) {
             return $html;
         }
