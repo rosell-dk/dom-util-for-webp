@@ -16,17 +16,15 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-20.04, windows-2022]  # We pick something other than in coverage.yml, which is also run on pushes
-        php: [5.6, 7.2]                   # We pick something other than in coverage.yml, which is also run on pushes
+        os: [ubuntu-latest, windows-latest]  # We pick something other than in coverage.yml, which is also run on pushes
+        php: [5.6, 7.2, 8.5]                   # We pick something other than in coverage.yml, which is also run on pushes
         exclude:  # phpunit is malfunctioning on Windows / PHP 5.6, so disable those tests
-            - os: windows-2019
-              php: 5.6
-            - os: windows-2022
+            - os: windows-latest
               php: 5.6
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -77,7 +75,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
