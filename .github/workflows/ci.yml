@@ -42,7 +42,7 @@ jobs:
       if: matrix.php == '7.2'
       run: |
         echo "Downgrading phpunit to ^8.0, which is the highest version that supports PHP 7.2"
-        composer require "phpunit/phpunit:^8.0" --dev --no-update
+        composer require "phpunit/phpunit:~8.0" --dev --no-update
 
     - name: Composer alterations for PHP 7.1
       if: matrix.php == '7.1'
