@@ -62,14 +62,7 @@ jobs:
         # PS: If we needed COVERAGE elsewhere, we could store in ENV like this:
         # echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
 
-    - name: Install SSH Key (for deployment of code coverage)
-      uses: shimataro/ssh-key-action@v2
-      with:
-        key: ${{ secrets.DEPLOY_KEY }}
-        known_hosts: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
-
-    - name: Upload code coverage report
-      run: |
-        sh -c "rsync -rtog --chown :www-data $GITHUB_WORKSPACE/build/ $DEPLOY_DESTINATION --delete"
+    - name: Deploy coverage report
+      run: npx wrangler@4 deploy
       env:
-        DEPLOY_DESTINATION: ${{ secrets.DEPLOY_DESTINATION }}
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
